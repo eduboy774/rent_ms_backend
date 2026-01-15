@@ -17,14 +17,14 @@ class Query(ObjectType):
         if filtering is None:
             return info.return_type.graphene_type(response=ResponseObject.get_response(id="2"), data = [])
         
-        vm_is_payment = VilcomPayment.objects.filter(is_active=True).values('uuid')
+        rent_ms_payment = VilcomPayment.objects.filter(is_active=True).values('uuid')
 
         if filtering.uuid is not None:
-            vm_is_payment = vm_is_payment.filter(uuid=filtering.uuid).values('uuid')
+            rent_ms_payment = rent_ms_payment.filter(uuid=filtering.uuid).values('uuid')
         if filtering.package_name is not None:
-            vm_is_payment = vm_is_payment.filter(name=filtering.package_name).values('package_name')
+            rent_ms_payment = rent_ms_payment.filter(name=filtering.package_name).values('package_name')
 
-        payment_list = list(map(lambda x: PaymentBuilders.get_vilcom_payment_data(str(x['uuid'])),vm_is_payment))
+        payment_list = list(map(lambda x: PaymentBuilders.get_vilcom_payment_data(str(x['uuid'])),rent_ms_payment))
         return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = payment_list)
     
     

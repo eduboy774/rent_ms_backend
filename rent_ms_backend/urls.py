@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 
 admin.autodiscover()
-admin.site.site_header = 'Vehicle Management System'
+admin.site.site_header = 'Rental Management System'
 
 
 urlpatterns = [

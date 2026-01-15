@@ -4,7 +4,7 @@ from django.contrib import admin
 from .models import *
 
 
-app_config = apps.get_app_config('vm_is_report')
+app_config = apps.get_app_config('rent_ms_report')
 
 # Get all models in the app
 models = app_config.get_models()

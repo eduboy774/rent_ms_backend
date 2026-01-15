@@ -24,17 +24,17 @@ class PaymentBuilders:
 
     def get_vilcom_payment_data(id):
         if id is not None:
-            vm_is_payment = VilcomPayment.objects.filter(uuid=id).first()
-            if vm_is_payment:
+            rent_ms_payment = VilcomPayment.objects.filter(uuid=id).first()
+            if rent_ms_payment:
                 return VilcomPaymentObject(
-                    id = vm_is_payment.id,
-                    uuid = vm_is_payment.uuid,
-                    status = vm_is_payment.status,
-                    method = vm_is_payment.method,
-                    paid_amount = vm_is_payment.paid_amount,
-                    paid_at = vm_is_payment.paid_at,
-                    order =PaymentBuilders.get_vilcom_order_data(vm_is_payment.order.uuid),
-                    is_active = vm_is_payment.is_active,
+                    id = rent_ms_payment.id,
+                    uuid = rent_ms_payment.uuid,
+                    status = rent_ms_payment.status,
+                    method = rent_ms_payment.method,
+                    paid_amount = rent_ms_payment.paid_amount,
+                    paid_at = rent_ms_payment.paid_at,
+                    order =PaymentBuilders.get_vilcom_order_data(rent_ms_payment.order.uuid),
+                    is_active = rent_ms_payment.is_active,
                 )
             else:
                 return VilcomPaymentObject()

@@ -40,7 +40,7 @@ class VilcomOrder(models.Model):
       status = models.CharField(max_length=20, choices=ORDER_STATUS, default='Pending')
       delivery_address = models.TextField()
       notes = models.TextField(blank=True, null=True)
-      reference_no = models.CharField(max_length=20, unique=True,blank=False,null=False, default=VmIsUtils.generate_reference_number)
+      reference_no = models.CharField(max_length=20, unique=True,blank=False,null=False, default=RentMsUtils.generate_reference_number)
       created_at = models.DateTimeField(default=timezone.now)
       is_active = models.BooleanField(default=True)
 
@@ -91,6 +91,6 @@ class VilcomPayment(models.Model):
             return "{}".format(self.method,self.id,self.uuid)
 
         class Meta:
-            db_table = "vm_is_payment"
+            db_table = "rent_ms_payment"
             ordering = ["-id"]
             verbose_name_plural = "03. Vilcom Payment"

@@ -2,9 +2,9 @@ import graphene
 from graphene_federation import build_schema
 from rent_ms_backend.decorators.Permission import has_mutation_access
 from .models import *
-from vm_is_dto.Uaa import UserRolesInputObjects, UserRoleObjects, UserPermisionInputObjects
-from vm_is_builders.UAABuilder import UAABuilder
-from vm_is_dto.Response import ResponseObject
+from rent_ms_dto.Uaa import UserRolesInputObjects, UserRoleObjects, UserPermisionInputObjects
+from rent_ms_builders.UAABuilder import UAABuilder
+from rent_ms_dto.Response import ResponseObject
 
 
 class CreateUserRolesMutation(graphene.Mutation):

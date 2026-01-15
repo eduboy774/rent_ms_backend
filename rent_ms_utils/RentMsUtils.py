@@ -8,7 +8,7 @@ class RentMsUtils:
             while True:
                 random_number = random.randint(1000, 9999)
                 reference = f'VIL-{date_str}-{random_number}'
-                VilcomOrder = apps.get_model('vm_is_payment', 'VilcomOrder')  # Lazy import
+                VilcomOrder = apps.get_model('rent_ms_payment', 'VilcomOrder')  # Lazy import
                 if not VilcomOrder.objects.filter(reference_no=reference).exists():
                     return reference
                 

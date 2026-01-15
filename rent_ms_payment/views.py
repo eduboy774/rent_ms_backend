@@ -9,7 +9,7 @@ from rent_ms_settings.models import *
 from django.utils import timezone
 from rent_ms_sms.models import VilcomSms
 from rent_ms_sms.views import SendSms
-from vm_is_utils.VmIsUtils import VmIsUtils
+from vm_is_utils.RentMsUtils import RentMsUtils
 from dotenv import dotenv_values
 
 
@@ -181,7 +181,7 @@ class CreateVilcomPaymentMutation(graphene.Mutation):
            else:
               paid_amount =  input.paid_amount * vilcom_order_items.quantity
 
-           vm_is_payment, success = VilcomPayment.objects.update_or_create(
+           rent_ms_payment, success = VilcomPayment.objects.update_or_create(
                 status = input.status.value,
                 method = input.method.value,
                 paid_amount = paid_amount,
@@ -192,7 +192,7 @@ class CreateVilcomPaymentMutation(graphene.Mutation):
                 }
             )
            
-        data = PaymentBuilders.get_vilcom_payment_data(id=vm_is_payment.uuid)
+        data = PaymentBuilders.get_vilcom_payment_data(id=rent_ms_payment.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
 class UpdateVilcomPaymentMutation(graphene.Mutation):
@@ -216,7 +216,7 @@ class UpdateVilcomPaymentMutation(graphene.Mutation):
            else:
               paid_amount =  input.paid_amount * vilcom_order_items.quantity
 
-           vm_is_payment, success = VilcomPayment.objects.update_or_create(
+           rent_ms_payment, success = VilcomPayment.objects.update_or_create(
                 uuid = input.uuid,
                 defaults={
                     'status' : input.status.value,
@@ -275,7 +275,7 @@ class UpdateVilcomPaymentMutation(graphene.Mutation):
            
                
 
-        data = PaymentBuilders.get_vilcom_payment_data(id=vm_is_payment.uuid)
+        data = PaymentBuilders.get_vilcom_payment_data(id=rent_ms_payment.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
 class ActivateOrDeactivateVilcomPaymentMutation(graphene.Mutation):
@@ -286,14 +286,14 @@ class ActivateOrDeactivateVilcomPaymentMutation(graphene.Mutation):
     @classmethod
     def mutate(self, root, info, uuid):
         
-        vm_is_payment = VilcomPayment.objects.filter(uuid=uuid).first()
-        if vm_is_payment.is_active == True :
-           vm_is_payment.is_active = False
-           vm_is_payment.save()
+        rent_ms_payment = VilcomPayment.objects.filter(uuid=uuid).first()
+        if rent_ms_payment.is_active == True :
+           rent_ms_payment.is_active = False
+           rent_ms_payment.save()
            return self(ResponseObject.get_response(id='10'))
-        elif vm_is_payment.is_active == False :
-             vm_is_payment.is_active = True
-             vm_is_payment.save()
+        elif rent_ms_payment.is_active == False :
+             rent_ms_payment.is_active = True
+             rent_ms_payment.save()
              return self(ResponseObject.get_response(id='9'))
     
 
