@@ -1,7 +1,7 @@
 import json
 from django.contrib.sessions.models import Session
 
-from vm_is_dto.Response import ResponseObject
+from rent_ms_dto.Response import ResponseObject
 
 
 def has_mutation_access(permissions=[]):

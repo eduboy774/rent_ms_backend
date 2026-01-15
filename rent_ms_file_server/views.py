@@ -4,16 +4,16 @@ import graphene
 import magic
 
 from rent_ms_accounts.models import UsersProfiles
-from vm_is_builders.SettingsBuilders import SettingsBuilders
-from vm_is_builders.UserAccountsBuilders import UserAccountBuilder
-from vm_is_dto.Files import Base64FileInputObjects, Base64StringInputObjects
-from vm_is_dto.Response import ResponseObject
-from vm_is_dto.Settings import VilcomFoodObject, VilcomServiceObject
-from vm_is_dto.UserAccounts import UserProfileObject
+from rent_ms_builders.SettingsBuilders import SettingsBuilders
+from rent_ms_builders.UserAccountsBuilders import UserAccountBuilder
+from rent_ms_dto.Files import Base64FileInputObjects, Base64StringInputObjects
+from rent_ms_dto.Response import ResponseObject
+from rent_ms_dto.Settings import VilcomFoodObject, VilcomServiceObject
+from rent_ms_dto.UserAccounts import UserProfileObject
 from rent_ms_settings.models import VilcomFood, VilcomPackage, VilcomService
-from vm_is_utils.FileUtils import UploadFile
-from vm_is_utils.UserUtils import UserUtils
-from vm_is_dto.Enum import ProductTypeEnum
+from rent_ms_utils.FileUtils import UploadFile
+from rent_ms_utils.UserUtils import UserUtils
+from rent_ms_dto.Enum import ProductTypeEnum
 
 
 class UploadFileMutation(graphene.Mutation):

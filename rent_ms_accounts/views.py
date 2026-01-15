@@ -23,7 +23,6 @@ config = dotenv_values(".env")
 class CreateUsersMutation(graphene.Mutation):
     class Arguments:
         input = UserInputObject(required=True)
-        
 
     response = graphene.Field(ResponseObject)
     data = graphene.Field(UserProfileAndRoleObjects) 
@@ -41,6 +40,8 @@ class CreateUsersMutation(graphene.Mutation):
                 username=input.user_email,
                 email=input.user_email,
             )
+            user.set_password(input.password)
+            user.save()
 
             user_profile = UsersProfiles.objects.create(
                 profile_type=input.profile_type.value,

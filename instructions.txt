@@ -24,6 +24,10 @@
 6. Create superuser
     Command: ./manage.py createsuperuser
 
+username:admin@rentms@gmail.com
+email:admin.rentms@gmail.com
+password:RentMS@1234
+
 7. Modify Settings.py to general standards
 
 8. Create a main_schema.py file to publish all Queries and Mutations to the GraphQL

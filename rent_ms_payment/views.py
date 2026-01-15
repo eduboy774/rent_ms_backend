@@ -1,15 +1,15 @@
 import graphene
-from vm_is_builders.PaymentBuilders import PaymentBuilders
-from vm_is_dto.Enum import PaymentMethodInum, PaymentStatusInum, PaymentTypeInum
-from vm_is_dto.Payment import *
-from vm_is_dto.Response import ResponseObject
-from vm_is_dto.Settings import *
+from rent_ms_builders.PaymentBuilders import PaymentBuilders
+from rent_ms_dto.Enum import PaymentMethodInum, PaymentStatusInum, PaymentTypeInum
+from rent_ms_dto.Payment import *
+from rent_ms_dto.Response import ResponseObject
+from rent_ms_dto.Settings import *
 from rent_ms_payment.models import VilcomOrder, VilcomOrderItem, VilcomPayment
 from rent_ms_settings.models import *
 from django.utils import timezone
-from rent_ms_sms.models import VilcomSms
+from rent_ms_sms.models import RentMsSms
 from rent_ms_sms.views import SendSms
-from vm_is_utils.RentMsUtils import RentMsUtils
+from rent_ms_utils.RentMsUtils import RentMsUtils
 from dotenv import dotenv_values
 
 
@@ -91,7 +91,7 @@ class CreateVilcomOrderMutation(graphene.Mutation):
                     print(e)
                     print("Failed to send bulk SMS")
 
-            VilcomSms.objects.create(
+            RentMsSms.objects.create(
                status = bulk_response.get('status'),
                code = bulk_response.get('code'),
                message =bulk_response.get('message'),
@@ -264,7 +264,7 @@ class UpdateVilcomPaymentMutation(graphene.Mutation):
                     print(e)
                     print("Failed to send bulk SMS")
 
-        VilcomSms.objects.create(
+        RentMsSms.objects.create(
                status = bulk_response.get('status'),
                code = bulk_response.get('code'),
                message =bulk_response.get('message'),

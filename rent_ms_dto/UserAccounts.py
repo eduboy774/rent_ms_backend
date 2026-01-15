@@ -84,7 +84,8 @@ class UsersAndRoleResponseObject(graphene.ObjectType):
 
 class UsersResponseObject(graphene.ObjectType):
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(UserProfileObjects)
+    data = graphene.List(UserProfileObjects)
+    page = graphene.Field(PageObject)
 
 class SetPasswordFilteringInputObject(graphene.InputObjectType):
     request_token = graphene.String()

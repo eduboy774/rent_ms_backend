@@ -15,10 +15,11 @@ class Query(ObjectType):
     get_user_profile_and_role = graphene.Field(UserProfileAndRoleResponseObject)
 
 
-        # @has_query_access(permissions=['can_manage_settings','can_view_settings'])
+    # @has_query_access(permissions=['can_manage_settings','can_view_settings'])
     def resolve_get_users(self, info,filtering=None,**kwargs):
         try:
             all_users =UsersProfiles.objects.filter(profile_is_active=True).values('profile_unique_id','profile_type')
+            
             if filtering.profile_type is not None:
                 all_users = all_users.filter(profile_type=filtering.profile_type.value)
                 
@@ -29,12 +30,9 @@ class Query(ObjectType):
             all_users=paginated_users.page(filtering.page_number)
             page_object=PageObject.get_page(all_users)
                 
-            # all_users_list = list(map(lambda x: UserAccountBuilder.get_user_profile_data(str(x['profile_unique_id'])), all_users))
-            all_users_list=UserAccountBuilder.get_user_profile_data(filtering.profile_unique_id)
-            
-            return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"),data=all_users_list,page = page_object)
+            all_users_list = list(map(lambda x: UserAccountBuilder.get_user_profile_data(str(x['profile_unique_id'])), all_users))
 
-            # return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"),data=all_users_list , page = page_object)
+            return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"),data=all_users_list,page = page_object)
         except Exception as e:
             print('getting users exception',e)
             return info.return_type.graphene_type(response=ResponseObject.get_response(id="6"))
