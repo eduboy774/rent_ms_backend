@@ -1,0 +1,79 @@
+[
+    {
+        "id": "1",
+        "code": 9000,
+        "status": true,
+        "message": "Operation Success"
+    },
+    {
+        "id": "2",
+        "code": 9001,
+        "status": false,
+        "message": "Record Not Found"
+    },
+    {
+        "id": "3",
+        "code": 9002,
+        "status": false,
+        "message": "Duplicate Record"
+    },
+    {
+        "id": "4",
+        "code": 9003,
+        "status": false,
+        "message": "Email Already Used"
+    },
+    {
+        "id": "5",
+        "code": 9004,
+        "status": false,
+        "message": "User Profile Not Found"
+
+    },
+    {
+        "id": "6",
+        "code": 9005,
+        "status": false,
+        "message": "Something went wrong on our end. Please reach out to the system administrator."
+    },
+    {
+        "id": "7",
+        "code": 9006,
+        "status": false,
+        "message": "Wrong Email  Format"
+    },
+    {
+        "id": "8",
+        "code": 9007,
+        "status": true,
+        "message": "Account SuccessFull Created"
+    },
+    {
+        "id": "9",
+        "code": 9008,
+        "status": true,
+        "message": "Activated Successfull"
+    },
+    {
+        "id": "10",
+        "code": 9009,
+        "status": true,
+        "message": "Deactivated Successfull"
+    },
+    {
+        "id": "11",
+        "code": 9010,
+        "status": false,
+        "message": "The Product Type You Provided Not Found"
+    },
+    {
+        "id": "12",
+        "code": 9011,
+        "status": false,
+        "message": "Files Extension Is Null"
+    }
+
+
+   
+]
+  

@@ -1,0 +1,67 @@
+1. Create virtualenv 
+   installation of virtual environment
+    Command:pip install virtualenv
+    Command: virtualenv venv
+2. Activate environment
+    Command: source venv/bin/activate 
+     in window .\venv\Scripts\Activate.ps1
+     Checking using command -  Set-ExecutionPolicy -Scope Process Bypass
+    Command:To delete virtual env rm  -rf virtual_venv
+
+
+
+3. Install Python Libraries
+    Since you will have the most used "requirement.txt" file you will install all the important packages within the file
+    Command: pip install -r requirements.txt
+
+4. Create a new project
+    Command: django-admin startproject {project_name} . (Adding fullstop will create the project at the same directory as the environment)
+
+5. Make Initial Migrations
+    Command: ./manage.py makemigrations
+             ./manage.py migrate
+            
+6. Create superuser
+    Command: ./manage.py createsuperuser
+
+7. Modify Settings.py to general standards
+
+8. Create a main_schema.py file to publish all Queries and Mutations to the GraphQL
+
+9. Modify urls.py to add providers and django graphene
+    Imports:
+        from django.views.decorators.csrf import csrf_exempt
+        from graphene_django.views import GraphQLView
+
+    path('oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    path('api', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+
+
+10. Create an application called recipes
+    Command: ./manage.py startapp {app_name}
+
+    NB: Remember to add the app on main_app/settings.py
+
+11.
+
+//Note B
+// to delete db.sqlite
+rm -rf db.sqlite
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+find . -path "*/migrations/*.pyc"  -delete
+
+Todele existing git
+# rm -r -fo .git
+
+echo "# vm_is_back_end" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/eduboy774/vm_is_back_end.git
+git push -u origin main
+
+
+git remote add origin https://github.com/eduboy774/vm_is_back_end.git
+git branch -M main
+git push -u origin main
