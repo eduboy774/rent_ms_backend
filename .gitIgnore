@@ -1,8 +1,8 @@
 
 
-vilcom_media/
-vilcom_media-prod/
-vilcom_static/
+rent_ms_media/
+rent_ms_media-prod/
+rent_ms_static/
 _migrations/*
 !_migrations/*
 
@@ -11,9 +11,7 @@ _migrations/*
 /db.sqlite3
 /__pycache__/*
 *.pyc 
-# vm_is_backend/settings.py
 
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
