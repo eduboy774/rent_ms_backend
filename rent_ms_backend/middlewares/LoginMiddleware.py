@@ -13,7 +13,7 @@ class ConcurrentLoginMiddleware:
 
             if request.POST['grant_type'] == 'password':
 
-                login_user = AccessToken.objects.filter(user__username=str(request.POST['username']), expires__gte=now(), client__client_id='a4b63c47664ea8730c4c').first() 
+                login_user = AccessToken.objects.filter(user__username=str(request.POST['username']), expires__gte=now(), client__client_id='92add61e415ed86bc525').first() 
                 if login_user:
                     login_user.expires=now()
                     login_user.save()

@@ -20,40 +20,6 @@ class ProfileLevelInum(enum.Enum):
 
 ProfileLevelEnum = graphene.Enum.from_enum(ProfileLevelInum)
 
-class RelationShipInum(enum.Enum):
-    Mother  = 'Mother'
-    Father = 'Father'
-    Auncle  = 'Auncle'
-    Aunt = 'Aunt'
-    Brother = 'Brother'
-    Sister ='Sister'
-
-RelationShipEnum = graphene.Enum.from_enum(RelationShipInum)
-
-class VehicleTypeInum(enum.Enum):
-    Cars ='Cars'
-    ThreeWheelers ='ThreeWheelers'
-    Motorcycles ='Motorcycles'
-
-VehicleTypeEnum = graphene.Enum.from_enum(VehicleTypeInum)
-
-class TransmissionCategoryInum(enum.Enum):
-    Automatic = 'Automatic'
-    Manual = 'Manual'
-
-TransmissionCategoryEnum = graphene.Enum.from_enum(TransmissionCategoryInum)
-
-class VehicleUsageCategoryInum(enum.Enum):
-    Personal = 'Personal'
-    Commercial = 'Commercial'
-
-VehicleUsageCategoryEnum = graphene.Enum.from_enum(VehicleUsageCategoryInum)
-
-class VehicleClassificationInum(enum.Enum):
-    Passengers = 'Passengers'
-    Goods = 'Goods'
-
-VehicleClassificationEnum = graphene.Enum.from_enum(VehicleClassificationInum)
 
 class OrderStatusInum(enum.Enum):
     Pending = "Pending"

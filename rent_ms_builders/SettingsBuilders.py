@@ -4,86 +4,60 @@ from rent_ms_builders.UserAccountsBuilders import UserAccountBuilder
 
 
 class SettingsBuilders:
-# Drivers
-    def get_vm_is_driver_data(id):
+# Houses
+    def get_house_data(id):
         if id is not None:
-            vm_is_driver = VmIsDrivers.objects.filter(uuid=id).first()
-            if vm_is_driver:
-                return VmIsDriverObject(
-                    id = vm_is_driver.id,
-                    uuid = vm_is_driver.uuid,
-                    tin_number = vm_is_driver.tin_number,
-                    driver_licence = vm_is_driver.driver_licence,
-                    driver_info = UserAccountBuilder.get_user_profile_data(vm_is_driver.driver_info.profile_unique_id),
-                    is_active = vm_is_driver.is_active,
+            house = House.objects.filter(uuid=id).first()
+            if house:
+                return HouseObject(
+                    id = house.id,
+                    uuid = house.uuid,
+                    name = house.name,
+                    address = house.address,
+                    description = house.description,
+                    owner_info = UserAccountBuilder.get_user_profile_data(house.owner_info.profile_unique_id),
+                    is_active = house.is_active,
                 )
             else:
-                return VmIsDriverObject()
+                return HouseObject()
         else:
-            VmIsDriverObject()
+            HouseObject()
 
-# Trustees
-    def get_vm_is_driver_trustee_data(id):
+# Rooms
+    def get_room_data(id):
         if id is not None:
-            vm_is_driver_trustee = VmIsTrustees.objects.filter(uuid=id).first()
-            if vm_is_driver_trustee:
-                return VmIsTrusteeObject(
-                    id = vm_is_driver_trustee.id,
-                    uuid = vm_is_driver_trustee.uuid,
-                    first_name = vm_is_driver_trustee.first_name,
-                    middle_name = vm_is_driver_trustee.middle_name,
-                    last_name = vm_is_driver_trustee.last_name,
-                    relationship = vm_is_driver_trustee.relationship,
-                    is_active = vm_is_driver_trustee.is_active,
+            room = Room.objects.filter(uuid=id).first()
+            if room:
+                return RoomObject(
+                    id = room.id,
+                    uuid = room.uuid,
+                    name = room.name,
+                    number = room.number,
+                    capacity = room.capacity,
+                    price_per_night = room.price_per_night,
+                    is_active = room.is_active,
                 )
             else:
-                return VmIsTrusteeObject()
+                return RoomObject()
         else:
-            VmIsTrusteeObject()
+            RoomObject()
 
-# Vehicles
-    def get_vm_is_vehicle_data(id):
+# Notifications
+    def get_notification_data(id):
         if id is not None:
-            vm_is_vehicle = VmIsVehicles.objects.filter(uuid=id).first()
-            if vm_is_vehicle:
-                return VmIsVehicles(
-                    id = vm_is_vehicle.id,
-                    uuid = vm_is_vehicle.uuid,
-                    Chassis_number = vm_is_vehicle.chassis_number,
-                    registration_number = vm_is_vehicle.registration_number,
-                    vehicle_model = vm_is_vehicle.vehicle_model,
-                    vehicle_colour = vm_is_vehicle.vehicle_colour,
-                    vehicle_type = vm_is_vehicle.vehicle_type,
-                    vehicle_usage_category = vm_is_vehicle.vehicle_usage_category,
-                    transmission_category = vm_is_vehicle.transmission_category,
-                    vehicle_classification = vm_is_vehicle.vehicle_classification,
-                    vehicle_attachment = vm_is_vehicle.vehicle_attachment,
-                    is_active = vm_is_vehicle.is_active,
+            notification = Notification.objects.filter(uuid=id).first()
+            if notification:
+                return NotificationObject(
+                    id = notification.id,
+                    uuid = notification.uuid,
+                    medium = notification.medium,
+                    payload = notification.payload,
+                    status = notification.status,
+                    attempts = notification.attempts,
+                    error_message = notification.error_message,
+                    is_active = notification.is_active,
                 )
             else:
-                return VmIsVehicleObject()
+                return NotificationObject()
         else:
-            VmIsVehicleObject()
-            
-
-# Contracts
-    def get_vm_is_contract_data(id):
-        if id is not None:
-            vm_is_contract = VmIsContracts.objects.filter(uuid=id).first()
-            if vm_is_contract:
-                return VmIsContracts(
-                    id = vm_is_contract.id,
-                    uuid = vm_is_contract.uuid,
-                    contract_start_date = vm_is_contract.contract_start_date,
-                    contract_end_date = vm_is_contract.contract_end_date,
-                    vehicle = vm_is_contract.vehicle,
-                    driver = vm_is_contract.driver,
-                    contract_amount = vm_is_contract.contract_amount,
-                    interest_rate = vm_is_contract.interest_rate,
-                    total_month = vm_is_contract.total_month,
-                    is_active = vm_is_contract.is_active,
-                )
-            else:
-                return VmIsContractObject()
-        else:
-            VmIsContractObject()
+            NotificationObject()

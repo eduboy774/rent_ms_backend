@@ -5,57 +5,59 @@ from rent_ms_dto.Settings import *
 from rent_ms_settings.models import *
 from django.utils import timezone
 
-# DRIVERS API
-class CreateVmIsDriverMutation(graphene.Mutation):
+# House API
+class CreateHouseMutation(graphene.Mutation):
     class Arguments:
-        input = VmIsDriverInputObject()
+        input = HouseInputObject()
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(VmIsDriverObject)
+    data = graphene.Field(HouseObject)
 
     @classmethod
     def mutate(self, root, info, input):
-        if input.user_profile_uuid:
-            user_profile = UsersProfiles.objects.filter(profile_unique_id=input.user_profile_uuid,profile_is_active=True).first()
-        
-        vm_is_driver, success = VmIsDrivers.objects.update_or_create(
-            tin_number = input.tin_number,
-            driver_licence = input.driver_licence,
-            driver_info = user_profile,
+        if input.owner_uuid:
+            owner_info = UsersProfiles.objects.filter(profile_unique_id=input.owner_uuid,profile_is_active=True).first()
+
+        house, success = House.objects.update_or_create(
+            name = input.name,
+            owner_info = owner_info,
+            address = input.address,
+            description = input.description,
             defaults={
                 'is_active': True
             }
         )
 
-        data = SettingsBuilders.get_vm_is_driver_data(id=vm_is_driver.uuid)
+        data = SettingsBuilders.get_house_data(id=house.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
-class UpdateVmIsDriverMutation(graphene.Mutation):
+class UpdateHouseMutation(graphene.Mutation):
     class Arguments:
-        input = VmIsDriverInputObject()
+        input = HouseInputObject()
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(VmIsDriverObject)
+    data = graphene.Field(HouseObject)
 
     @classmethod
     def mutate(self, root, info, input):
-        if input.user_profile_uuid:
-            user_profile = UsersProfiles.objects.filter(uuid=input.user_profile_uuid,is_active=True).first()
-        
-        vm_is_driver, success = VmIsDrivers.objects.update_or_create(
+        if input.owner_uuid:
+            owner_info = UsersProfiles.objects.filter(uuid=input.owner_uuid,is_active=True).first()
+
+        house, success = House.objects.update_or_create(
             uuid = input.uuid,
             defaults={
-                'tin_number' : input.tin_number,
-                'driver_licence':input.driver_licence,
-                'driver_info':user_profile,
+                'name' : input.name,
+                'address' : input.address,
+                'description' : input.description,
+                'owner_info':owner_info,
                 'is_active': True
             }
         )
 
-        data = SettingsBuilders.get_vm_is_driver_data(id=vm_is_driver.uuid)
+        data = SettingsBuilders.get_house_data(id=house.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
-class DeleteVmIsDriverMutation(graphene.Mutation):
+class DeleteHouseMutation(graphene.Mutation):
     class Arguments:
         uuid = graphene.String()
     response = graphene.Field(ResponseObject)
@@ -63,249 +65,158 @@ class DeleteVmIsDriverMutation(graphene.Mutation):
     @classmethod
     def mutate(self, root, info, uuid):
         
-        vm_is_driver = VmIsDrivers.objects.filter(uuid=uuid).first()
-        vm_is_driver.is_active = False
-        vm_is_driver.save()
+        house = House.objects.filter(uuid=uuid).first()
+        house.is_active = False
+        house.save()
         return self(ResponseObject.get_response(id='1'))
 
 
-# TRUSTEES API
-class CreateVmIsTrusteeMutation(graphene.Mutation):
+# ROOM API
+class CreateRoomMutation(graphene.Mutation):
     class Arguments:
-        input = VmIsDriverInputObject()
+        input = RoomInputObject()
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(VmIsTrusteeObject)
+    data = graphene.Field(RoomObject)
 
     @classmethod
     def mutate(self, root, info, input):
-        if input.driver_uuid:
-            driver = VmIsDrivers.objects.filter(uuid=input.driver_uuid, is_active=True).first()
-            
-        vm_is_driver_trustee, success = VmIsTrustees.objects.update_or_create(
-            first_name = input.first_name,
-            middle_name = input.middle_name,
-            last_name = input.last_name,
-            driver = driver,
-            relationship = input.relationship,
+        if input.house_uuid:
+            house = House.objects.filter(uuid=input.house_uuid, is_active=True).first()
+
+        room, success = Room.objects.update_or_create(
+            name = input.name,
+            number = input.number,
+            capacity = input.capacity,
+            price_per_night = input.price_per_night,
+            house_info = house,
             defaults={
                 'is_active': True
             }
         )
 
-        data = SettingsBuilders.get_vm_is_driver_trustee_data(id=vm_is_driver_trustee.uuid)
+        data = SettingsBuilders.get_room_data(id=room.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
 
-class UpdateVmIsTrusteeMutation(graphene.Mutation):
+class UpdateRoomMutation(graphene.Mutation):
     class Arguments:
-        input = VmIsTrusteeInputObject()
+        input = RoomInputObject()
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(VmIsTrusteeObject)
+    data = graphene.Field(RoomObject)
 
     @classmethod
     def mutate(self, root, info, input):
-        if input.driver_uuid:
-            driver = VmIsDrivers.objects.filter(uuid=input.driver_uuid, is_active=True).first()
+        if input.house_uuid:
+            house_info = House.objects.filter(uuid=input.house_uuid, is_active=True).first()
         
-        vm_is_driver_trustee, success = VmIsTrustees.objects.update_or_create(
+        room, success = Room.objects.update_or_create(
             uuid = input.uuid,
             defaults={
-                'first_name' : input.first_name,
-                'middle_name' : input.middle_name,
-                'middle_name' : input.last_name,
-                'last_name' : input.last_name,
-                'driver' : driver,
-                'relationship' : input.relationhip,
-                'photo' : input.photo,
+                'name' : input.name,
+                'number' : input.number,
+                'capacity' : input.capacity,
+                'price_per_night' : input.price_per_night,
+                'house_info' : house_info,
                 'is_active': True
             }
         )
 
-        data = SettingsBuilders.get_vm_is_driver_trustee_data(id=vm_is_driver_trustee.uuid)
+        data = SettingsBuilders.get_room_data(id=room.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
-class DeleteVmIsTrusteeMutation(graphene.Mutation):
+class DeleteRoomMutation(graphene.Mutation):
     class Arguments:
         uuid = graphene.String()
     response = graphene.Field(ResponseObject)
 
     @classmethod
     def mutate(self, root, info, uuid):
-        vm_is_driver_trustee = VmIsTrustees.objects.filter(uuid=uuid).first()
-        vm_is_driver_trustee.is_active = False
-        vm_is_driver_trustee.save()
+        room = Room.objects.filter(uuid=uuid).first()
+        room.is_active = False
+        room.save()
         return self(ResponseObject.get_response(id='1'))
 
 
-# VEHICLE's API
-class CreateVmIsVehicleMutation(graphene.Mutation):
+# Notification's API
+class CreateNotificationMutation(graphene.Mutation):
     class Arguments:
-        input = VmIsVehicleInputObject()
+        input = NotificationInputObject()
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(VmIsVehicleObject)
+    data = graphene.Field(NotificationObject)
 
     @classmethod
     def mutate(self, root, info, input):
-        if input.user_profile_uuid:
-            user_profile = UsersProfiles.objects.filter(uuid=input.user_profile_uuid,is_active=True).first()
         
-        vm_is_vehicle, success = VmIsVehicles.objects.update_or_create(
-            chassis_number = input.chassis_number,
-            registration_number = input.registration_number,
-            vehicle_model = input.vehicle_model,
-            vehicle_colour = input.vehicle_colour,
+        notification, success = Notification.objects.update_or_create(
+            medium = input.medium,
+            payload = input.payload,
+            status = input.status,
+            attempts = input.attempts,
+            error_message = input.error_message,
             defaults={
                 'is_active': True
             }
         )
 
-        data = SettingsBuilders.get_vm_is_vehicle_data(id=vm_is_vehicle.uuid)
+        data = SettingsBuilders.get_notification_data(id=notification.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
-class UpdateVmIsVehicleMutation(graphene.Mutation):
+class UpdateNotificationMutation(graphene.Mutation):
     class Arguments:
-        input = VmIsVehicleInputObject()
+        input = NotificationInputObject()
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(VmIsVehicleObject)
+    data = graphene.Field(NotificationObject)
 
     @classmethod
     def mutate(self, root, info, input):
-        if input.user_profile_uuid:
-            user_profile = UsersProfiles.objects.filter(uuid=input.user_profile_uuid,is_active=True).first()
         
-        vm_is_vehicle, success = VmIsVehicles.objects.update_or_create(
+        notification, success = Notification.objects.update_or_create(
             uuid = input.uuid,
             defaults={
-                'chassis_number' : input.chassis_number,
-                'registration_number' : input.registration_number,
-                'vehicle_model' : input.vehicle_model,
-                'vehicle_colour' : input.vehicle_colour,
-                'vehicle_type' : input.vehicle_type,
-                'vehicle_usage_category' : input.vehicle_usage_category,
-                'transmission_category' : input.transmission_category,
-                'vehicle_classification' : input.vehicle_classification,
-                'vehicle_attachment' : input.vehicle_attachment,
+                'medium' : input.medium,
+                'payload' : input.payload,
+                'status' : input.status,
+                'attempts' : input.attempts,
+                'error_message' : input.error_message,
                 'is_active': True
             }
         )
 
-        data = SettingsBuilders.get_vm_is_vehicle_data(id=vm_is_vehicle.uuid)
+        data = SettingsBuilders.get_notification_data(id=notification.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
-class DeleteVmIsVehicleMutation(graphene.Mutation):
+class DeleteNotificationMutation(graphene.Mutation):
     class Arguments:
         uuid = graphene.String()
     response = graphene.Field(ResponseObject)
 
     @classmethod
     def mutate(self, root, info, uuid):
-        vm_is_vehicle = VmIsVehicles.objects.filter(uuid=uuid).first()
-        vm_is_vehicle.is_active = False
-        vm_is_vehicle.save()
+        notification = Notification.objects.filter(uuid=uuid).first()
+        notification.is_active = False
+        notification.save()
         return self(ResponseObject.get_response(id='1'))
     
     
-# CONTRACT's API
-class CreateVmIsContractMutation(graphene.Mutation):
-    class Arguments:
-        input = VmIsContractInputObject()
-
-    response = graphene.Field(ResponseObject)
-    data = graphene.Field(VmIsContractObject)
-
-    @classmethod
-    def mutate(self, root, info, input):
-        contract_created_at_time = timezone.now()
-        if input.vehicle_uuid:
-            vehicle = VmIsVehicles.objects.filter(uuid=input.vehicle_uuid,is_active=True).first()
-        if input.driver_uuid:
-            driver = VmIsDrivers.objects.filter(uuid=input.driver_uuid, is_active=True).first()
-        
-        vm_is_contract, success = VmIsContracts.objects.update_or_create(
-            contract_start_date = input.contract_start_date,
-            contract_end_date = input.contract_end_date,
-            vehicle = vehicle,
-            driver = driver,
-            contract_amount = input.contract_amount,
-            interest_rate = input.interest_rate,
-            total_month = input.total_month,
-            created_at = contract_created_at_time,
-            defaults={
-                'is_active': True
-            }
-        )
-
-        data = SettingsBuilders.get_vm_is_contract_data(id=vm_is_contract.uuid)
-        return self(ResponseObject.get_response(id='1'), data=data)
-
-class UpdateVmIsContractMutation(graphene.Mutation):
-    class Arguments:
-        input = VmIsContractInputObject()
-
-    response = graphene.Field(ResponseObject)
-    data = graphene.Field(VmIsContracts)
-
-    @classmethod
-    def mutate(self, root, info, input):
-        contract_created_at_time = timezone.now()
-        if input.vehicle_uuid:
-            vehicle = VmIsVehicles.objects.filter(uuid=input.vehicle_uuid,is_active=True).first()
-        if input.driver_uuid:
-            driver = VmIsDrivers.objects.filter(uuid=input.driver_uuid, is_active=True).first()
-        
-        vm_is_contract, success = VmIsContracts.objects.update_or_create(
-            uuid = input.uuid,
-            defaults={
-                'contract_start_date ' : input.contract_start_date,
-                'contract_end_date' : input.contract_end_date,
-                'vehicle' : vehicle,
-                'driver' : driver,
-                'contract_amount' : input.contract_amount,
-                'interest_rate' : input.interest_rate,
-                'total_month' : input.total_month,
-                'created_at' : contract_created_at_time,
-                'is_active': True
-            }
-        )
-
-        data = SettingsBuilders.get_vm_is_contract_data(id=vm_is_contract.uuid)
-        return self(ResponseObject.get_response(id='1'), data=data)
-
-class DeleteVmIsContractMutation(graphene.Mutation):
-    class Arguments:
-        uuid = graphene.String()
-    response = graphene.Field(ResponseObject)
-
-    @classmethod
-    def mutate(self, root, info, uuid):
-        vm_is_contract = VmIsContracts.objects.filter(uuid=uuid).first()
-        vm_is_contract.is_active = False
-        vm_is_contract.save()
-        return self(ResponseObject.get_response(id='1'))
 
 
 class Mutation(graphene.ObjectType):
     
-    # Drivers Mutation
-    delete_driver_mutation = DeleteVmIsDriverMutation().Field()
-    update_driver_mutation = UpdateVmIsDriverMutation().Field()
-    create_driver_mutation = CreateVmIsDriverMutation().Field()
-    
-    # Trustees Mutation
-    delete_trustee_mutation = DeleteVmIsTrusteeMutation().Field()
-    update_trustee_mutation = UpdateVmIsTrusteeMutation().Field()
-    create_trustee_mutation = CreateVmIsTrusteeMutation().Field()
-    
-    # Vehicle Mutation
-    delete_vehicle_mutation = DeleteVmIsVehicleMutation().Field()
-    update_vehicle_mutation = UpdateVmIsVehicleMutation().Field()
-    create_vehicle_mutation = CreateVmIsVehicleMutation().Field()
-    
-    # Contract Mutation
-    delete_contract_mutation = DeleteVmIsContractMutation().Field()
-    # update_contract_mutation = UpdateVmIsContractMutation().Field()
-    create_contract_mutation = CreateVmIsContractMutation().Field()
+    # House Mutation
+    delete_house_mutation = DeleteHouseMutation().Field()
+    update_house_mutation = UpdateHouseMutation().Field()
+    create_house_mutation = CreateHouseMutation().Field()
+
+    # Room Mutation
+    delete_room_mutation = DeleteRoomMutation().Field()
+    update_room_mutation = UpdateRoomMutation().Field()
+    create_room_mutation = CreateRoomMutation().Field()
+
+    # Notification Mutation
+    delete_notification_mutation = DeleteNotificationMutation().Field()
+    update_notification_mutation = UpdateNotificationMutation().Field()
+    create_notification_mutation = CreateNotificationMutation().Field()
