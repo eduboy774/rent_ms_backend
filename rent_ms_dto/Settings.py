@@ -1,5 +1,4 @@
 import graphene
-from rent_ms_dto.Enum import VehicleTypeEnum
 from rent_ms_dto.Response import ResponseObject
 from rent_ms_dto.UserAccounts import UserProfileObject
 

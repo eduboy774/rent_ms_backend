@@ -6,77 +6,60 @@ from rent_ms_settings.models import *
 
 
 class Query(ObjectType): 
-    get_vm_is_drivers = graphene.Field(VmIsDriverResponseObject, filtering=VmIsDriverFilteringInputObject())
+    get_houses = graphene.Field(HouseResponseObject, filtering=HouseFilteringInputObject())
     
     @staticmethod
-    def resolve_get_vm_is_drivers(self, info,filtering=None,**kwargs):
+    def resolve_get_houses(self, info,filtering=None,**kwargs):
 
         if filtering is None:
             return info.return_type.graphene_type(response=ResponseObject.get_response(id="2"), data = [])
         
-        vm_is_driver = VmIsDrivers.objects.filter(is_active=True).values('uuid')
+        houses = House.objects.filter(is_active=True).values('uuid')
 
         if filtering.uuid is not None:
-            vm_is_driver = vm_is_driver.filter(uuid=filtering.uuid).values('uuid')
-        if filtering.tin_number is not None:
-            vm_is_driver = vm_is_driver.filter(name=filtering.tin_number).values('tin_number')
+            houses = houses.filter(uuid=filtering.uuid).values('uuid')
+        if filtering.name is not None:
+            houses = houses.filter(name=filtering.name).values('name')
 
-        driver_list = list(map(lambda x: SettingsBuilders.get_vm_is_driver_data(str(x['uuid'])),vm_is_driver))
-        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = driver_list)
-    
-    get_vm_is_driver_trustees = graphene.Field(VmIsDriverTrusteeResponseObject, filtering=VmIsDriverTrusteeFilteringInputObject())
+        house_list = list(map(lambda x: SettingsBuilders.get_house_data(str(x['uuid'])),houses))
+        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = house_list)
+
+    get_rooms = graphene.Field(RoomResponseObject, filtering=RoomFilteringInputObject())
     
     @staticmethod
-    def resolve_get_vm_is_trustees(self, info,filtering=None,**kwargs):
+    def resolve_get_rooms(self, info,filtering=None,**kwargs):
         
         if filtering is None:
             return info.return_type.graphene_type(response=ResponseObject.get_response(id="2"), data = [])
         
-        vm_is_trustee = VmIsTrustees.objects.filter(is_active=True).values('uuid')
+        room = Room.objects.filter(is_active=True).values('uuid')
         
         if filtering.uuid is not None:
-            vm_is_trustee = vm_is_trustee.filter(uuid=filtering.uuid).values('uuid')
-        if filtering.first_name and filtering.last_name is not None:
-            vm_is_trustee = vm_is_trustee.filter(firstName=filtering.first_name).values('first_name')
-            vm_is_trustee = vm_is_trustee.filter(lastName=filtering.last_name).values('last_name')
+            room = room.filter(uuid=filtering.uuid).values('uuid')
+        if filtering.name and filtering.number is not None:
+            room = room.filter(name=filtering.name).values('name')
+            room = room.filter(number=filtering.number).values('number')
             
-        trustee_list = list(map(lambda x: SettingsBuilders.get_vm_is_driver_trustee_data(str(x['uuid'])), vm_is_trustee))
-        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = trustee_list)
-    
-    get_vm_is_vehicles = graphene.Field(VmIsVehicleResponseObject, filtering=VmIsVehicleFilteringInputObject())
+        room_list = list(map(lambda x: SettingsBuilders.get_room_data(str(x['uuid'])), room))
+        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = room_list)
+
+    get_notification = graphene.Field(NotificationResponseObject, filtering=NotificationFilteringInputObject())
     
     @staticmethod
-    def resolve_get_vm_is_vehicles(self, info,filtering=None,**kwargs):
+    def resolve_get_notification(self, info,filtering=None,**kwargs):
         
         if filtering is None:
             return info.return_type.graphene_type(response=ResponseObject.get_response(id="2"), data = [])
         
-        vm_is_vehicle = VmIsVehicles.objects.filter(is_active=True).values('uuid')
+        notification = Notification.objects.filter(is_active=True).values('uuid')
         
         if filtering.uuid is not None:
-            vm_is_vehicle = vm_is_vehicle.filter(uuid=filtering.uuid).values('uuid')
-        if filtering.chassis_number and filtering.registration_number is not None:
-            vm_is_vehicle = vm_is_vehicle.filter(chassisNumber=filtering.chassis_number).values('chassis_number')
-            vm_is_vehicle = vm_is_vehicle.filter(registrationNumber=filtering.registration_number).values('registration_number')
-            
-        vehicle_list = list(map(lambda x: SettingsBuilders.get_vm_is_vehicle_data(str(x['uuid'])), vm_is_vehicle))
-        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = vehicle_list)
+            notification = notification.filter(uuid=filtering.uuid).values('uuid')
+        if filtering.medium and filtering.payload is not None:
+            notification = notification.filter(medium=filtering.medium).values('medium')
+            notification = notification.filter(payload=filtering.payload).values('payload')
+            notification_list = list(map(lambda x: SettingsBuilders.get_notification_data(str(x['uuid'])), notification))
+        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = notification_list)
     
-    get_vm_is_contracts = graphene.Field(VmIsContractResponseObject, filtering=VmIsContractFilteringInputObject())
     
-    @staticmethod
-    def resolve_get_vm_is_contracts(self, info,filtering=None,**kwargs):
-        
-        if filtering is None:
-            return info.return_type.graphene_type(response=ResponseObject.get_response(id="2"), data = [])
-        
-        vm_is_contract = VmIsContracts.objects.filter(is_active=True).values('uuid')
-        
-        if filtering.uuid is not None:
-            vm_is_contract = vm_is_contract.filter(uuid=filtering.uuid).values('uuid')
-        if filtering.contract_start_date and filtering.contract_end_date is not None:
-            vm_is_contract = vm_is_contract.filter(contractStartDate=filtering.contract_start_date).values('contract_start_date')
-            vm_is_contract = vm_is_contract.filter(contractEndDate=filtering.contract_end_date).values('contract_end_date')
-            
-        contract_list = list(map(lambda x: SettingsBuilders.get_vm_is_contract_data(str(x['uuid'])), vm_is_contract))
-        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = contract_list)
+    
