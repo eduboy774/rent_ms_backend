@@ -35,6 +35,7 @@ class SettingsBuilders:
                     number = room.number,
                     capacity = room.capacity,
                     price_per_night = room.price_per_night,
+                    house_info = SettingsBuilders.get_house_data(room.house_info.uuid),
                     is_active = room.is_active,
                 )
             else:

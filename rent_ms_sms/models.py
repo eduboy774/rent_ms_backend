@@ -25,7 +25,7 @@ class RentMsSms(models.Model):
         return "{}".format(self.status,self.id,self.uuid)
     
       class Meta:
-          db_table ="rent_ms_sms"
+          db_table ="sms"
           ordering =["-id"]
           verbose_name_plural ="01. Rent Ms Sms"
 

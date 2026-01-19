@@ -41,7 +41,7 @@ class UpdateHouseMutation(graphene.Mutation):
     @classmethod
     def mutate(self, root, info, input):
         if input.owner_uuid:
-            owner_info = UsersProfiles.objects.filter(uuid=input.owner_uuid,is_active=True).first()
+            owner_info = UsersProfiles.objects.filter(profile_unique_id=input.owner_uuid,profile_is_active=True).first()
 
         house, success = House.objects.update_or_create(
             uuid = input.uuid,
@@ -83,7 +83,7 @@ class CreateRoomMutation(graphene.Mutation):
     def mutate(self, root, info, input):
         if input.house_uuid:
             house = House.objects.filter(uuid=input.house_uuid, is_active=True).first()
-
+            
         room, success = Room.objects.update_or_create(
             name = input.name,
             number = input.number,

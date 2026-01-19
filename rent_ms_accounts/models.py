@@ -32,7 +32,7 @@ class UsersProfiles(models.Model):
     profile_createddate = models.DateField(auto_now_add=True)
 
     class Meta:
-        db_table = 'vilcom_user_profiles'
+        db_table = 'user_profiles'
         ordering = ['-id']
         verbose_name_plural = "USER PROFILES"
 
@@ -48,7 +48,7 @@ class ForgotPasswordRequestUsers(models.Model):
     request_is_active = models.BooleanField(default=True)
     
     class Meta:
-        db_table = 'vilcom_users_forgot_password_request'
+        db_table = 'forgot_password_request'
         ordering = ['-id']
         verbose_name_plural = "FORGOT PASSWORD REQUESTS"
 

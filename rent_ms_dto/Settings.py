@@ -37,6 +37,7 @@ class RoomInputObject(graphene.InputObjectType):
     price_per_night = graphene.String()
 
 class RoomObject(graphene.ObjectType):
+    id = graphene.String()
     uuid = graphene.String()
     house_info = graphene.Field(HouseObject)
     name = graphene.String()
