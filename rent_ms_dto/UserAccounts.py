@@ -70,7 +70,14 @@ class UserProfileObjects(graphene.ObjectType):
     user_first_name = graphene.String()
     user_last_name = graphene.String()
     user_email = graphene.String()
-    password = graphene.String()    
+    password = graphene.String() 
+    profile_phone = graphene.String()
+    profile_title = graphene.String()
+    profile_photo = graphene.String()
+    profile_is_active = graphene.Boolean()
+    profile_type = UserProfileEnum()
+    profile_level = ProfileLevelEnum()
+    profile_gender = GenderEnum()   
 
 
 class UserProfileAndRoleResponseObject(graphene.ObjectType):
@@ -84,7 +91,7 @@ class UsersAndRoleResponseObject(graphene.ObjectType):
 
 class UsersResponseObject(graphene.ObjectType):
     response = graphene.Field(ResponseObject)
-    data = graphene.List(UserProfileObjects)
+    data = graphene.List(UserProfileObjects) 
     page = graphene.Field(PageObject)
 
 class SetPasswordFilteringInputObject(graphene.InputObjectType):

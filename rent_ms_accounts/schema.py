@@ -41,13 +41,16 @@ class Query(ObjectType):
 
     def resolve_get_user_profile_and_role(self, info,**kwargs):
         profile_unique_id = UserUtils.__profile__(info.context.headers)
+        print('profile_unique_id',profile_unique_id)
         if profile_unique_id is None:
             return info.return_type.graphene_type(response=ResponseObject.get_response(id="6"))
 
         profile=UsersProfiles.objects.filter(profile_unique_id=profile_unique_id).first()
+        print('profile',profile)
         
         if profile is None:
             return info.return_type.graphene_type(response=ResponseObject.get_response(id="7"))
         
-        user_object=UserAccountBuilder.get_user_profile_and_role_data(profile.profile_unique_id)        
+        user_object=UserAccountBuilder.get_user_profile_and_role_data(profile.profile_unique_id)   
+        print('user_object',user_object)     
         return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"),data=user_object)

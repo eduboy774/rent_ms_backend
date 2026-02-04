@@ -32,18 +32,19 @@ class RoomInputObject(graphene.InputObjectType):
     uuid = graphene.String()
     house_uuid = graphene.String()
     name = graphene.String()
-    number = graphene.String()
-    capacity = graphene.String()
-    price_per_night = graphene.String()
+    number = graphene.Int()
+    capacity = graphene.Int()
+    price_per_night = graphene.Int()
 
 class RoomObject(graphene.ObjectType):
     id = graphene.String()
     uuid = graphene.String()
     house_info = graphene.Field(HouseObject)
     name = graphene.String()
-    number = graphene.String()
-    capacity = graphene.String()
-    price_per_night = graphene.String()
+    number = graphene.Int()
+    capacity = graphene.Int()
+    price_per_night = graphene.Int()
+    
     is_active = graphene.Boolean()
 
 class RoomResponseObject(graphene.ObjectType):
