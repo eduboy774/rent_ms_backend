@@ -58,8 +58,48 @@ class Query(ObjectType):
         if filtering.medium and filtering.payload is not None:
             notification = notification.filter(medium=filtering.medium).values('medium')
             notification = notification.filter(payload=filtering.payload).values('payload')
-            notification_list = list(map(lambda x: SettingsBuilders.get_notification_data(str(x['uuid'])), notification))
+        notification_list = list(map(lambda x: SettingsBuilders.get_notification_data(str(x['uuid'])), notification))
         return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = notification_list)
+    
+
+    get_room_rentals = graphene.Field(RoomRentalResponseObject,filtering=RoomRentalFilteringInputObject())
+
+    @staticmethod
+    def resolve_get_room_rentals(self, info, filtering=None, **kwargs):
+
+        if filtering is None:
+            return info.return_type.graphene_type(
+                response=ResponseObject.get_response(id="2"),
+                data=[]
+            )
+
+        rentals = RoomRental.objects.filter(is_active=True).values("uuid")
+
+        if filtering.uuid is not None:
+            rentals = rentals.filter(uuid=filtering.uuid).values("uuid")
+
+        if filtering.room_uuid is not None:
+            rentals = rentals.filter(room__uuid=filtering.room_uuid).values("uuid")
+
+        if filtering.renter_uuid is not None:
+            rentals = rentals.filter(
+                renter__profile_unique_id=filtering.renter_uuid
+            ).values("uuid")
+
+        if filtering.status is not None:
+            rentals = rentals.filter(status=filtering.status).values("uuid")
+
+        rental_list = list(
+            map(
+                lambda x: SettingsBuilders.get_room_rental_data(str(x["uuid"])),
+                rentals
+            )
+        )
+
+        return info.return_type.graphene_type(
+            response=ResponseObject.get_response(id="1"),
+            data=rental_list
+        )
     
     
     

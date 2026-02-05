@@ -2,6 +2,8 @@ from django.db import models
 from rent_ms_accounts.models import  UsersProfiles
 from django.utils import timezone
 import uuid
+from django.contrib.postgres.fields import DateRangeField
+
 
 MEDIUM = (
     ('Sms','Sms'),
@@ -13,6 +15,26 @@ STATUS = (
     ('Sent','Sent'),
     ('Failed','Failed')
 )
+
+RENTAL_STATUS = (
+        ('BOOKED', 'Booked'),
+        ('CANCELLED', 'Cancelled'),
+        ('COMPLETED', 'Completed'),
+    )
+
+CONSTRACT_STATUS = (
+        ('PENDING', 'Pending'),
+        ('ACTIVE', 'Active'),
+        ('EXPIRED', 'Expired'),
+        ('TERMINATED', 'Terminated'),
+    )
+
+BILLING_FREQUENCY = (
+        ('MONTHLY', 'Monthly'),
+        ('QUARTERLY', 'Quarterly'),
+        ('YEARLY', 'Yearly'),
+    )
+
 
 
 class House(models.Model):
@@ -72,4 +94,73 @@ class Notification(models.Model):
         db_table ="notifications"
         ordering =["-id"]
         verbose_name_plural ="03. Notifications"
+
+
+class RoomRental(models.Model):
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    room = models.ForeignKey(Room,on_delete=models.CASCADE,related_name='room_rentals')
+    renter = models.ForeignKey(UsersProfiles,on_delete=models.CASCADE,related_name='renter_profile')
+    period = DateRangeField()
+    status = models.CharField(max_length=20, choices=RENTAL_STATUS, default='BOOKED')
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "room_rentals"
+        ordering = ["-id"]
+        verbose_name_plural = "04. Room Rentals"
+
+    def __str__(self):
+        return f"RoomRental {self.uuid}"
+
+
+class HouseRental(models.Model):
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    house = models.ForeignKey(House,on_delete=models.CASCADE,related_name='house_rentals')
+    renter = models.ForeignKey(UsersProfiles,on_delete=models.CASCADE,related_name='house_renter_profile')
+    period = DateRangeField()
+    status = models.CharField(max_length=20, choices=RENTAL_STATUS, default='BOOKED')
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "house_rentals"
+        ordering = ["-id"]
+        verbose_name_plural = "05. House Rentals"
+
+    def __str__(self):
+        return f"HouseRental {self.uuid}"
+    
+
+class Contract(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    house = models.ForeignKey(House,on_delete=models.CASCADE,related_name='contracts')
+    room = models.ForeignKey(Room,on_delete=models.SET_NULL,null=True,blank=True,related_name='contracts')
+    owner = models.ForeignKey(UsersProfiles,on_delete=models.CASCADE,related_name='owned_contracts')
+    tenant = models.ForeignKey(UsersProfiles,on_delete=models.CASCADE,related_name='tenant_contracts')
+    period = DateRangeField()
+    term_months = models.IntegerField()
+    monthly_rent = models.IntegerField()
+    deposit_amount = models.IntegerField()
+    billing_frequency = models.CharField(max_length=20,choices=BILLING_FREQUENCY,default='MONTHLY')
+    auto_renew = models.BooleanField(default=False)
+    notice_period_days = models.IntegerField(default=30)
+    status = models.CharField(max_length=20,choices=CONSTRACT_STATUS,default='PENDING')
+    expired_at = models.DateTimeField(null=True, blank=True)
+    terminated_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "contracts"
+        ordering = ["-id"]
+        verbose_name_plural = "06. Contracts"
+
+    def __str__(self):
+        return f"Contract {self.uuid}"
 

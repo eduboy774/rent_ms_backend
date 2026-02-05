@@ -62,3 +62,28 @@ class SettingsBuilders:
                 return NotificationObject()
         else:
             NotificationObject()
+
+
+ # ---------------- ROOM RENTAL ----------------
+    def get_room_rental_data(id):
+        if id is not None:
+            rental = RoomRental.objects.filter(uuid=id).first()
+            if rental:
+                return RoomRentalObject(
+                    id=rental.id,
+                    uuid=str(rental.uuid),
+                    room=SettingsBuilders.get_room_data(
+                        rental.room.uuid if rental.room else None
+                    ),
+                    renter=SettingsBuilders.get_user_profile_data(
+                        rental.renter.profile_unique_id if rental.renter else None
+                    ),
+                    period=str(rental.period),
+                    status=rental.status,
+                    created_at=rental.created_at,
+                    is_active=rental.is_active,
+                )
+            else:
+                return RoomRentalObject()
+        else:
+            return RoomRentalObject()

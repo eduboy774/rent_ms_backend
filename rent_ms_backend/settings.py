@@ -58,7 +58,6 @@ INSTALLED_APPS = [
     'rent_ms_report',
     'rent_ms_uaa',
     'rent_ms_file_server',
-    'rent_ms_payment',
     'rent_ms_sms',
     
 
@@ -67,7 +66,8 @@ INSTALLED_APPS = [
     'provider',
     'provider.oauth2',
     'corsheaders',
-
+     
+    'django.contrib.postgres',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

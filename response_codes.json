@@ -71,9 +71,19 @@
         "code": 9011,
         "status": false,
         "message": "Files Extension Is Null"
+    },
+    {
+        "id": "13",
+        "code": 9012,
+        "status": false,
+        "message": "Room not found or inactive"
+    },
+    {
+        "id": "14",
+        "code": 9013,
+        "status": false,
+        "message": "Renter not found or inactive"
     }
-
-
    
 ]
   

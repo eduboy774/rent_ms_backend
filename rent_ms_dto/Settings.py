@@ -83,3 +83,37 @@ class NotificationFilteringInputObject(graphene.InputObjectType):
     uuid = graphene.String()
     medium = graphene.String()
     payload = graphene.String()
+
+
+
+    # 
+
+class RoomRentalInputObject(graphene.InputObjectType):
+    uuid = graphene.String()
+    room_uuid = graphene.String(required=True)
+    renter_uuid = graphene.String(required=True)
+    period_start = graphene.Date(required=True)
+    period_end = graphene.Date(required=True)
+    status = graphene.String()
+class RoomRentalObject(graphene.ObjectType):
+    id = graphene.String()
+    uuid = graphene.String()
+    room = graphene.Field(RoomObject)
+    renter = graphene.Field(UserProfileObject)
+    period = graphene.String()  # ISO range string
+    status = graphene.String()
+    created_at = graphene.DateTime()
+    is_active = graphene.Boolean()
+
+
+
+class RoomRentalResponseObject(graphene.ObjectType):
+    data = graphene.List(RoomRentalObject)
+    response = graphene.Field(ResponseObject)
+
+
+class RoomRentalFilteringInputObject(graphene.InputObjectType):
+    uuid = graphene.String()
+    room_uuid = graphene.String()
+    renter_uuid = graphene.String()
+    status = graphene.String()
