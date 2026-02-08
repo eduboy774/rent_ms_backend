@@ -6,6 +6,8 @@ from rent_ms_settings.models import *
 from django.utils import timezone
 from django.contrib.postgres.fields import DateRangeField
 from django.db import transaction
+from psycopg2.extras import DateRange
+
 
 # House API
 class CreateHouseMutation(graphene.Mutation):
@@ -23,7 +25,6 @@ class CreateHouseMutation(graphene.Mutation):
         house, success = House.objects.update_or_create(
             name = input.name,
             owner_info = owner_info,
-            address = input.address,
             description = input.description,
             defaults={
                 'is_active': True
@@ -49,7 +50,6 @@ class UpdateHouseMutation(graphene.Mutation):
             uuid = input.uuid,
             defaults={
                 'name' : input.name,
-                'address' : input.address,
                 'description' : input.description,
                 'owner_info':owner_info,
                 'is_active': True
@@ -73,69 +73,61 @@ class DeleteHouseMutation(graphene.Mutation):
         return self(ResponseObject.get_response(id='1'))
 
 
-# ROOM API
-class CreateRoomMutation(graphene.Mutation):
+# Renter API
+class CreateRenterMutation(graphene.Mutation):
     class Arguments:
-        input = RoomInputObject()
+        input = RenterInputObject()
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(RoomObject)
+    data = graphene.Field(RenterObject)
 
     @classmethod
     def mutate(self, root, info, input):
-        if input.house_uuid:
-            house = House.objects.filter(uuid=input.house_uuid, is_active=True).first()
             
-        room, success = Room.objects.update_or_create(
-            name = input.name,
-            number = input.number,
-            capacity = input.capacity,
-            price_per_night = input.price_per_night,
-            house_info = house,
+        renter, success = Renter.objects.update_or_create(
+            full_name = input.full_name,
+            phone_number = input.phone_number,
+            nida_number = input.nida_number,
             defaults={
                 'is_active': True
             }
         )
 
-        data = SettingsBuilders.get_room_data(id=room.uuid)
+        data = SettingsBuilders.get_renter_data(id=renter.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
 
-class UpdateRoomMutation(graphene.Mutation):
+class UpdateRenterMutation(graphene.Mutation):
     class Arguments:
-        input = RoomInputObject()
+        input = RenterInputObject()
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(RoomObject)
+    data = graphene.Field(RenterObject)
 
     @classmethod
     def mutate(self, root, info, input):
-        if input.house_uuid:
-            house_info = House.objects.filter(uuid=input.house_uuid, is_active=True).first()
         
-        room, success = Room.objects.update_or_create(
+        renter, success = Renter.objects.update_or_create(
             uuid = input.uuid,
             defaults={
-                'name' : input.name,
-                'number' : input.number,
-                'capacity' : input.capacity,
-                'price_per_night' : input.price_per_night,
-                'house_info' : house_info,
+                'full_name' : input.full_name,
+                'phone_number' : input.phone_number,
+                'nida_number' : input.nida_number,
                 'is_active': True
             }
         )
 
-        data = SettingsBuilders.get_room_data(id=room.uuid)
+        data = SettingsBuilders.get_renter_data(id=renter.uuid)
         return self(ResponseObject.get_response(id='1'), data=data)
 
-class DeleteRoomMutation(graphene.Mutation):
+class DeleteRenterMutation(graphene.Mutation):
     class Arguments:
         uuid = graphene.String()
     response = graphene.Field(ResponseObject)
 
     @classmethod
     def mutate(self, root, info, uuid):
-        room = Room.objects.filter(uuid=uuid).first()
+        room = Renter.objects.filter(uuid=uuid).first()
         room.is_active = False
         room.save()
         return self(ResponseObject.get_response(id='1'))
@@ -204,30 +196,32 @@ class DeleteNotificationMutation(graphene.Mutation):
         return self(ResponseObject.get_response(id='1'))
     
 
-class CreateRoomRentalMutation(graphene.Mutation):
+class CreateHouseRentalMutation(graphene.Mutation):
     class Arguments:
-        input = RoomRentalInputObject()
+        input = HouseRentalInputObject()
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(RoomRentalObject)
+    data = graphene.Field(HouseRentalObject)
 
     @classmethod
     @transaction.atomic
     def mutate(cls, root, info, input):
 
-        room = Room.objects.filter(
-            uuid=input.room_uuid,
+        house = House.objects.filter(
+            uuid=input.house_uuid,
             is_active=True
         ).first()
 
-        if not room:
+        
+
+        if not house:
             return cls(
                 response=ResponseObject.get_response(id='13')
             )
 
-        renter = UsersProfiles.objects.filter(
-            profile_unique_id=input.renter_uuid,
-            profile_is_active=True
+        renter = Renter.objects.filter(
+            uuid=input.renter_uuid,
+            is_active=True
         ).first()
 
         if not renter:
@@ -235,11 +229,15 @@ class CreateRoomRentalMutation(graphene.Mutation):
                 response=ResponseObject.get_response(id='14')
             )
 
-        rental = RoomRental.objects.create(
-            room=room,
+        rental = HouseRental.objects.create(
+            house=house,
+            owner=house.owner_info,
             renter=renter,
-            period=DateRange(input.period_start, input.period_end),
-            status=input.status or 'BOOKED',
+            duration=input.duration or '3_MONTHS',
+            amount=input.amount,
+            auto_renew=input.auto_renew or False,
+            notice_period_days=input.notice_period_days or 30,
+            status=input.status or 'PENDING',
             is_active=True
         )
 
@@ -249,25 +247,36 @@ class CreateRoomRentalMutation(graphene.Mutation):
         )
     
 
-class UpdateRoomRentalMutation(graphene.Mutation):
+class UpdateHouseRentalMutation(graphene.Mutation):
     class Arguments:
-        input = RoomRentalInputObject()
+        input = HouseRentalInputObject(required=True)
 
     response = graphene.Field(ResponseObject)
-    data = graphene.Field(RoomRentalObject)
+    data = graphene.Field(HouseRentalObject)
 
     @classmethod
     @transaction.atomic
     def mutate(cls, root, info, input):
 
-        rental = RoomRental.objects.filter(uuid=input.uuid).first()
-        if not rental:
-            return cls(
-                response=ResponseObject.get_response(id='13')
-            )
+        rental = HouseRental.objects.filter(
+            uuid=input.uuid,
+            is_active=True
+        ).first()
 
-        if input.period_start and input.period_end:
-            rental.period = DateRange(input.period_start, input.period_end)
+        if not rental:
+            return cls(response=ResponseObject.get_response(id='13'))
+
+        if input.duration:
+            rental.duration = input.duration
+
+        if input.amount is not None:
+            rental.amount = input.amount
+
+        if input.auto_renew is not None:
+            rental.auto_renew = input.auto_renew
+
+        if input.notice_period_days is not None:
+            rental.notice_period_days = input.notice_period_days
 
         if input.status:
             rental.status = input.status
@@ -278,9 +287,10 @@ class UpdateRoomRentalMutation(graphene.Mutation):
             response=ResponseObject.get_response(id='1'),
             data=rental
         )
+
     
 
-class DeleteRoomRentalMutation(graphene.Mutation):
+class DeleteHouseRentalMutation(graphene.Mutation):
     class Arguments:
         uuid = graphene.String(required=True)
 
@@ -289,7 +299,7 @@ class DeleteRoomRentalMutation(graphene.Mutation):
     @classmethod
     def mutate(cls, root, info, uuid):
 
-        rental = RoomRental.objects.filter(uuid=uuid).first()
+        rental = HouseRental.objects.filter(uuid=uuid).first()
         if not rental:
             return cls(
                 response=ResponseObject.get_response(id='13')
@@ -311,10 +321,10 @@ class Mutation(graphene.ObjectType):
     update_house_mutation = UpdateHouseMutation().Field()
     create_house_mutation = CreateHouseMutation().Field()
 
-    # Room Mutation
-    delete_room_mutation = DeleteRoomMutation().Field()
-    update_room_mutation = UpdateRoomMutation().Field()
-    create_room_mutation = CreateRoomMutation().Field()
+    # Renter Mutation
+    delete_renter_mutation = DeleteRenterMutation().Field()
+    update_renter_mutation = UpdateRenterMutation().Field()
+    create_renter_mutation = CreateRenterMutation().Field()
 
     # Notification Mutation
     delete_notification_mutation = DeleteNotificationMutation().Field()
@@ -322,7 +332,7 @@ class Mutation(graphene.ObjectType):
     create_notification_mutation = CreateNotificationMutation().Field()
 
 
-    # Room Rental Mutation
-    create_room_rental_mutation = CreateRoomRentalMutation().Field()
-    update_room_rental_mutation = UpdateRoomRentalMutation().Field()
-    delete_room_rental_mutation = DeleteRoomRentalMutation().Field()
+    # House Rental Mutation
+    create_house_rental_mutation = CreateHouseRentalMutation().Field()
+    update_house_rental_mutation = UpdateHouseRentalMutation().Field()
+    delete_house_rental_mutation = DeleteHouseRentalMutation().Field()

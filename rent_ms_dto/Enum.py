@@ -21,16 +21,6 @@ class ProfileLevelInum(enum.Enum):
 ProfileLevelEnum = graphene.Enum.from_enum(ProfileLevelInum)
 
 
-class OrderStatusInum(enum.Enum):
-    Pending = "Pending"
-    Confirmed = "Confirmed"
-    Preparing = "Preparing"
-    Out_For_Delivery = "Out_For_Delivery"
-    Delivered = "Delivered"
-    Cancelled = "Cancelled"
-
-OrderStatusEnum = graphene.Enum.from_enum(OrderStatusInum)
-
 class PaymentStatusInum(enum.Enum):
     Pending = "Pending"
     Completed = "Completed"

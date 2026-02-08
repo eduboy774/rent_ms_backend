@@ -28,33 +28,29 @@ class HouseFilteringInputObject(graphene.InputObjectType):
     name = graphene.String()
 
 # Room's
-class RoomInputObject(graphene.InputObjectType):
+class RenterInputObject(graphene.InputObjectType):
     uuid = graphene.String()
-    house_uuid = graphene.String()
-    name = graphene.String()
-    number = graphene.Int()
-    capacity = graphene.Int()
-    price_per_night = graphene.Int()
+    full_name = graphene.String()
+    phone_number = graphene.Int()
+    nida_number = graphene.String()
 
-class RoomObject(graphene.ObjectType):
+class RenterObject(graphene.ObjectType):
     id = graphene.String()
     uuid = graphene.String()
-    house_info = graphene.Field(HouseObject)
-    name = graphene.String()
-    number = graphene.Int()
-    capacity = graphene.Int()
-    price_per_night = graphene.Int()
-    
+    full_name = graphene.String()
+    phone_number = graphene.Int()
+    nida_number = graphene.String()
     is_active = graphene.Boolean()
 
-class RoomResponseObject(graphene.ObjectType):
-    data = graphene.List(RoomObject)
+
+class RenterResponseObject(graphene.ObjectType):
+    data = graphene.List(RenterObject)
     response = graphene.Field(ResponseObject)
 
-class RoomFilteringInputObject(graphene.InputObjectType):
+class RenterFilteringInputObject(graphene.InputObjectType):
     uuid = graphene.String()
-    name = graphene.String()
-    number = graphene.String()
+    full_name = graphene.String()
+    phone_number = graphene.String()
 
 # Notification's
 class NotificationInputObject(graphene.InputObjectType):
@@ -86,34 +82,42 @@ class NotificationFilteringInputObject(graphene.InputObjectType):
 
 
 
-    # 
-
-class RoomRentalInputObject(graphene.InputObjectType):
+    # house rental
+class HouseRentalInputObject(graphene.InputObjectType):
     uuid = graphene.String()
-    room_uuid = graphene.String(required=True)
+    house_uuid = graphene.String(required=True)
+    owner_uuid = graphene.String(required=True)
     renter_uuid = graphene.String(required=True)
-    period_start = graphene.Date(required=True)
-    period_end = graphene.Date(required=True)
+    duration = graphene.String(required=True)
+    amount = graphene.Float(required=True)
     status = graphene.String()
-class RoomRentalObject(graphene.ObjectType):
+
+class HouseRentalObject(graphene.ObjectType):
     id = graphene.String()
     uuid = graphene.String()
-    room = graphene.Field(RoomObject)
-    renter = graphene.Field(UserProfileObject)
-    period = graphene.String()  # ISO range string
+    house = graphene.Field(HouseObject)
+    owner = graphene.Field(UserProfileObject)
+    renter = graphene.Field(RenterObject)
+    duration = graphene.String()
+    notice_period_days = graphene.Int()
+    amount = graphene.Float()
+    auto_renew = graphene.Boolean()
     status = graphene.String()
+    expired_at = graphene.DateTime()
+    terminated_at = graphene.DateTime()
     created_at = graphene.DateTime()
     is_active = graphene.Boolean()
 
 
 
-class RoomRentalResponseObject(graphene.ObjectType):
-    data = graphene.List(RoomRentalObject)
+class HouseRentalResponseObject(graphene.ObjectType):
+    data = graphene.List(HouseRentalObject)
     response = graphene.Field(ResponseObject)
 
 
-class RoomRentalFilteringInputObject(graphene.InputObjectType):
+class HouseRentalFilteringInputObject(graphene.InputObjectType):
     uuid = graphene.String()
-    room_uuid = graphene.String()
+    house_uuid = graphene.String()
+    owner_uuid = graphene.String()
     renter_uuid = graphene.String()
     status = graphene.String()

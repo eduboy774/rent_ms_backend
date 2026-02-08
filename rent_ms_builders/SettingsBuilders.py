@@ -13,7 +13,6 @@ class SettingsBuilders:
                     id = house.id,
                     uuid = house.uuid,
                     name = house.name,
-                    address = house.address,
                     description = house.description,
                     owner_info = UserAccountBuilder.get_user_profile_data(house.owner_info.profile_unique_id),
                     is_active = house.is_active,
@@ -23,25 +22,23 @@ class SettingsBuilders:
         else:
             HouseObject()
 
-# Rooms
-    def get_room_data(id):
+# Renter
+    def get_renter_data(id):
         if id is not None:
-            room = Room.objects.filter(uuid=id).first()
-            if room:
-                return RoomObject(
-                    id = room.id,
-                    uuid = room.uuid,
-                    name = room.name,
-                    number = room.number,
-                    capacity = room.capacity,
-                    price_per_night = room.price_per_night,
-                    house_info = SettingsBuilders.get_house_data(room.house_info.uuid),
-                    is_active = room.is_active,
+            renter = Renter.objects.filter(uuid=id).first()
+            if renter:
+                return RenterObject(
+                    id = renter.id,
+                    uuid = renter.uuid,
+                    full_name = renter.full_name,
+                    phone_number = renter.phone_number,
+                    nida_number = renter.nida_number,
+                    is_active = renter.is_active,
                 )
             else:
-                return RoomObject()
+                return RenterObject()
         else:
-            RoomObject()
+            return RenterObject()
 
 # Notifications
     def get_notification_data(id):
@@ -64,26 +61,34 @@ class SettingsBuilders:
             NotificationObject()
 
 
- # ---------------- ROOM RENTAL ----------------
-    def get_room_rental_data(id):
+ # ---------------- House RENTAL ----------------
+    def get_house_rental_data(id):
         if id is not None:
-            rental = RoomRental.objects.filter(uuid=id).first()
+            rental = HouseRental.objects.filter(uuid=id).first()
             if rental:
-                return RoomRentalObject(
+                return HouseRentalObject(
                     id=rental.id,
                     uuid=str(rental.uuid),
-                    room=SettingsBuilders.get_room_data(
-                        rental.room.uuid if rental.room else None
+                    house=SettingsBuilders.get_house_data(
+                        rental.house.uuid if rental.house else None
                     ),
-                    renter=SettingsBuilders.get_user_profile_data(
-                        rental.renter.profile_unique_id if rental.renter else None
+                    owner=UserAccountBuilder.get_user_profile_data(
+                        rental.owner.profile_unique_id if rental.owner else None
                     ),
-                    period=str(rental.period),
+                    renter=SettingsBuilders.get_renter_data(
+                        rental.renter.uuid if rental.renter else None
+                    ),
+                    duration=rental.duration,
+                    notice_period_days=rental.notice_period_days,
+                    amount=rental.amount,
+                    auto_renew=rental.auto_renew,
                     status=rental.status,
+                    expired_at=rental.expired_at,
+                    terminated_at=rental.terminated_at,
                     created_at=rental.created_at,
                     is_active=rental.is_active,
                 )
             else:
-                return RoomRentalObject()
+                return HouseRentalObject()
         else:
-            return RoomRentalObject()
+            return HouseRentalObject()

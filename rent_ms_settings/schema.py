@@ -24,24 +24,23 @@ class Query(ObjectType):
         house_list = list(map(lambda x: SettingsBuilders.get_house_data(str(x['uuid'])),houses))
         return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = house_list)
 
-    get_rooms = graphene.Field(RoomResponseObject, filtering=RoomFilteringInputObject())
+    get_renters = graphene.Field(RenterResponseObject, filtering=RenterFilteringInputObject())
     
     @staticmethod
-    def resolve_get_rooms(self, info,filtering=None,**kwargs):
+    def resolve_get_renters(self, info,filtering=None,**kwargs):
         
         if filtering is None:
             return info.return_type.graphene_type(response=ResponseObject.get_response(id="2"), data = [])
         
-        room = Room.objects.filter(is_active=True).values('uuid')
+        renter = Renter.objects.filter(is_active=True).values('uuid')
         
         if filtering.uuid is not None:
-            room = room.filter(uuid=filtering.uuid).values('uuid')
-        if filtering.name and filtering.number is not None:
-            room = room.filter(name=filtering.name).values('name')
-            room = room.filter(number=filtering.number).values('number')
+            renter = renter.filter(uuid=filtering.uuid).values('uuid')
+        if filtering.full_name is not None:
+            renter = renter.filter(full_name=filtering.full_name).values('full_name')
             
-        room_list = list(map(lambda x: SettingsBuilders.get_room_data(str(x['uuid'])), room))
-        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = room_list)
+        renter_list = list(map(lambda x: SettingsBuilders.get_renter_data(str(x['uuid'])), renter))
+        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = renter_list)
 
     get_notification = graphene.Field(NotificationResponseObject, filtering=NotificationFilteringInputObject())
     
@@ -62,10 +61,10 @@ class Query(ObjectType):
         return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data = notification_list)
     
 
-    get_room_rentals = graphene.Field(RoomRentalResponseObject,filtering=RoomRentalFilteringInputObject())
+    get_house_rentals = graphene.Field(HouseRentalResponseObject,filtering=HouseRentalFilteringInputObject())
 
     @staticmethod
-    def resolve_get_room_rentals(self, info, filtering=None, **kwargs):
+    def resolve_get_house_rentals(self, info, filtering=None, **kwargs):
 
         if filtering is None:
             return info.return_type.graphene_type(
@@ -73,13 +72,13 @@ class Query(ObjectType):
                 data=[]
             )
 
-        rentals = RoomRental.objects.filter(is_active=True).values("uuid")
+        rentals = HouseRental.objects.filter(is_active=True).values("uuid")
 
         if filtering.uuid is not None:
             rentals = rentals.filter(uuid=filtering.uuid).values("uuid")
 
-        if filtering.room_uuid is not None:
-            rentals = rentals.filter(room__uuid=filtering.room_uuid).values("uuid")
+        if filtering.house_uuid is not None:
+            rentals = rentals.filter(house__uuid=filtering.house_uuid).values("uuid")
 
         if filtering.renter_uuid is not None:
             rentals = rentals.filter(
