@@ -90,7 +90,7 @@ class Query(ObjectType):
 
         rental_list = list(
             map(
-                lambda x: SettingsBuilders.get_room_rental_data(str(x["uuid"])),
+                lambda x: SettingsBuilders.get_house_rental_data(str(x["uuid"])),
                 rentals
             )
         )

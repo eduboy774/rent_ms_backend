@@ -7,8 +7,14 @@ from django.utils import timezone
 from django.contrib.postgres.fields import DateRangeField
 from django.db import transaction
 from psycopg2.extras import DateRange
+from rent_ms_sms.models import RentMsSms
+from rent_ms_sms.views import SendSms
+from rent_ms_utils.RentalUtils import RentalUtils
 
+from dotenv import dotenv_values
 
+config = dotenv_values(".env")
+callbackUrl = config['VILCOM_CALL_BACK_URL']
 # House API
 class CreateHouseMutation(graphene.Mutation):
     class Arguments:
@@ -228,18 +234,69 @@ class CreateHouseRentalMutation(graphene.Mutation):
             return cls(
                 response=ResponseObject.get_response(id='14')
             )
+        
+        amount = float(input.amount)
+        duration_months = int(input.duration)
 
         rental = HouseRental.objects.create(
             house=house,
             owner=house.owner_info,
             renter=renter,
-            duration=input.duration or '3_MONTHS',
+            duration=input.duration or '3',
             amount=input.amount,
+            total_amount= amount * duration_months,
             auto_renew=input.auto_renew or False,
             notice_period_days=input.notice_period_days or 30,
             status=input.status or 'PENDING',
             is_active=True
         )
+
+        if rental:
+                
+                message_to_send = RentalUtils.generate_rental_confirmation_message(
+                    rental.renter.renter_title,
+                    rental.renter.full_name,
+                    rental.house.name,
+                    rental.duration,
+                    rental.total_amount,
+                    rental.reference_no
+                    )
+
+                phone_number = rental.renter.phone_number
+                third_party_ref = RentalUtils.generate_transaction_reference()
+
+                    # preparing sms and send
+                bulk_request = {
+                            "senderId": "Vilcom",
+                            "envelopes": [
+                                {
+                                    "message":message_to_send ,
+                                    "number":phone_number ,
+                                    "thirdPartyRef":third_party_ref
+                                },
+                            ],
+                            "callbackUrl": callbackUrl
+                        }
+
+                try:
+                            bulk_response = SendSms.send_bulk_sms(bulk_request)
+                            print(
+                                bulk_response.get('status'),
+                                bulk_response.get('code'),
+                                bulk_response.get('message')
+                            )
+                except Exception as e:
+                        print(e)
+                        print("Failed to send bulk SMS")
+
+                RentMsSms.objects.create(
+                status = bulk_response.get('status'),
+                code = bulk_response.get('code'),
+                message =bulk_response.get('message'),
+                message_to_user = message_to_send ,
+                user_phone_number = phone_number,
+                third_party_ref = third_party_ref
+                )
 
         return cls(
             response=ResponseObject.get_response(id='1'),

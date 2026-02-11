@@ -33,12 +33,15 @@ class RenterInputObject(graphene.InputObjectType):
     full_name = graphene.String()
     phone_number = graphene.Int()
     nida_number = graphene.String()
+    renter_title = graphene.String()
+
 
 class RenterObject(graphene.ObjectType):
     id = graphene.String()
     uuid = graphene.String()
     full_name = graphene.String()
-    phone_number = graphene.Int()
+    renter_title = graphene.String()
+    phone_number = graphene.String()
     nida_number = graphene.String()
     is_active = graphene.Boolean()
 
@@ -91,6 +94,9 @@ class HouseRentalInputObject(graphene.InputObjectType):
     duration = graphene.String(required=True)
     amount = graphene.Float(required=True)
     status = graphene.String()
+    auto_renew = graphene.Boolean()
+    notice_period_days = graphene.Float(required=False)
+
 
 class HouseRentalObject(graphene.ObjectType):
     id = graphene.String()
@@ -101,6 +107,7 @@ class HouseRentalObject(graphene.ObjectType):
     duration = graphene.String()
     notice_period_days = graphene.Int()
     amount = graphene.Float()
+    total_amount = graphene.Float()
     auto_renew = graphene.Boolean()
     status = graphene.String()
     expired_at = graphene.DateTime()

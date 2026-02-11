@@ -4,6 +4,8 @@ from django.utils import timezone
 import uuid
 from django.contrib.postgres.fields import DateRangeField
 
+from rent_ms_utils.RentalUtils import RentalUtils
+
 
 MEDIUM = (
     ('Sms','Sms'),
@@ -25,9 +27,9 @@ CONSTRACT_STATUS = (
     )
 
 DURATION = (
-        ('3_MONTHS', 'Three Months'),
-        ('6_MONTHS', 'Six Months'),
-        ('12_MONTHS', 'One Year'),    )
+        (3, 'Three Months'),
+        (6, 'Six Months'),
+        (12, 'One Year'), )
 
 
 
@@ -54,7 +56,9 @@ class Renter(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(editable=False,default=uuid.uuid4,unique=True)
     full_name =models.CharField(max_length=255,unique=False,blank=False,null=False)
-    phone_number =models.IntegerField(unique=False,blank=True,null=True)
+    renter_title = models.CharField(default='', max_length=9000, blank=True,null=True)
+    full_name =models.CharField(max_length=255,unique=False,blank=False,null=False)
+    phone_number = models.CharField(max_length=15)
     nida_number =models.CharField(max_length=255,unique=False,blank=False,null=False)
     created_at = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
@@ -92,11 +96,13 @@ class HouseRental(models.Model):
 
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    reference_no = models.CharField(max_length=20, unique=True,blank=False,null=False, default=RentalUtils.generate_contract_reference)
     house = models.ForeignKey(House,on_delete=models.CASCADE,related_name='house_contracts')
     owner = models.ForeignKey(UsersProfiles,on_delete=models.CASCADE,related_name='owned_contracts')
     renter = models.ForeignKey(Renter,on_delete=models.CASCADE,related_name='renter_contracts')
-    duration = models.CharField(max_length=50,choices=DURATION,default='3_MONTHS')
+    duration = models.CharField(max_length=50,choices=DURATION,default='3')
     amount =  models.DecimalField(max_digits=15,decimal_places=2)
+    total_amount =  models.DecimalField(max_digits=15,decimal_places=2)
     auto_renew = models.BooleanField(default=False)
     notice_period_days = models.IntegerField(default=30)
     status = models.CharField(max_length=50,choices=CONSTRACT_STATUS,default='PENDING')
