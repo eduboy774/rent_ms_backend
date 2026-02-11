@@ -83,6 +83,12 @@
         "code": 9013,
         "status": false,
         "message": "Renter not found or inactive"
+    },
+     {
+        "id": "15",
+        "code": 9013,
+        "status": false,
+        "message": "Renter Alread Exist In the Same House"
     }
    
 ]

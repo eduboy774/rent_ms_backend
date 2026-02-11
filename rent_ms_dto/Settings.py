@@ -31,7 +31,7 @@ class HouseFilteringInputObject(graphene.InputObjectType):
 class RenterInputObject(graphene.InputObjectType):
     uuid = graphene.String()
     full_name = graphene.String()
-    phone_number = graphene.Int()
+    phone_number = graphene.String()
     nida_number = graphene.String()
     renter_title = graphene.String()
 
@@ -89,7 +89,6 @@ class NotificationFilteringInputObject(graphene.InputObjectType):
 class HouseRentalInputObject(graphene.InputObjectType):
     uuid = graphene.String()
     house_uuid = graphene.String(required=True)
-    owner_uuid = graphene.String(required=True)
     renter_uuid = graphene.String(required=True)
     duration = graphene.String(required=True)
     amount = graphene.Float(required=True)

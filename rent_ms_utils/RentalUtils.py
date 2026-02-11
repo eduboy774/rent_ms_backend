@@ -28,7 +28,7 @@ class RentalUtils:
         return (
             f"Dear {customer_title} {customer_name}, "
             f"your rental contract {contract_number} for {house_name} "
-            f"({duration}) has been successfully created. "
+            f"({duration}) Moths has been successfully created. "
             f"The agreed rent amount is {amount} TZS. "
             f"Thank you for choosing our housing services."
         )

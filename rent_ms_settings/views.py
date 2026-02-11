@@ -219,7 +219,6 @@ class CreateHouseRentalMutation(graphene.Mutation):
         ).first()
 
         
-
         if not house:
             return cls(
                 response=ResponseObject.get_response(id='13')
@@ -238,6 +237,18 @@ class CreateHouseRentalMutation(graphene.Mutation):
         amount = float(input.amount)
         duration_months = int(input.duration)
 
+        existing_rental = HouseRental.objects.filter(
+            house=house,
+            renter=renter,
+            owner=house.owner_info,
+            is_active=True
+        ).exists()
+
+        if existing_rental:
+            return cls(
+                response=ResponseObject.get_response(id='15')  # create a new response ID
+            )
+
         rental = HouseRental.objects.create(
             house=house,
             owner=house.owner_info,
@@ -250,6 +261,7 @@ class CreateHouseRentalMutation(graphene.Mutation):
             status=input.status or 'PENDING',
             is_active=True
         )
+        
 
         if rental:
                 
@@ -298,10 +310,9 @@ class CreateHouseRentalMutation(graphene.Mutation):
                 third_party_ref = third_party_ref
                 )
 
-        return cls(
-            response=ResponseObject.get_response(id='1'),
-            data=rental
-        )
+
+        data = SettingsBuilders.get_house_rental_data(id=rental.uuid)
+        return cls(response=ResponseObject.get_response(id='1'), data=data)
     
 
 class UpdateHouseRentalMutation(graphene.Mutation):
