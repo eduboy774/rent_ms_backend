@@ -86,7 +86,7 @@
     },
      {
         "id": "15",
-        "code": 9013,
+        "code": 9014,
         "status": false,
         "message": "Renter Alread Exist In the Same House"
     }
