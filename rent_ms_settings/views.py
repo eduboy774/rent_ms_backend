@@ -10,6 +10,7 @@ from psycopg2.extras import DateRange
 from rent_ms_sms.models import RentMsSms
 from rent_ms_sms.views import SendSms
 from rent_ms_utils.RentalUtils import RentalUtils
+from django.utils import timezone
 
 from dotenv import dotenv_values
 
@@ -380,6 +381,53 @@ class DeleteHouseRentalMutation(graphene.Mutation):
             response=ResponseObject.get_response(id='1')
         )
  
+class ActivateContractMutation(graphene.Mutation):
+    class Arguments:
+        uuid = graphene.String(required=True)
+
+    response = graphene.Field(ResponseObject)
+
+    @classmethod
+    def mutate(cls, root, info, uuid):
+
+        rental = HouseRental.objects.filter(uuid=uuid).first()
+        if not rental:
+            return cls(
+                response=ResponseObject.get_response(id='13')
+            )
+
+        rental.status = ContractStatusInum.ACTIVE.value
+        rental.activated_at = timezone.now()
+
+        rental.save()
+
+        return cls(
+            response=ResponseObject.get_response(id='1')
+        )
+    
+class TerminateContractMutation(graphene.Mutation):
+    class Arguments:
+        uuid = graphene.String(required=True)
+
+    response = graphene.Field(ResponseObject)
+
+    @classmethod
+    def mutate(cls, root, info, uuid):
+
+        rental = HouseRental.objects.filter(uuid=uuid).first()
+        if not rental:
+            return cls(
+                response=ResponseObject.get_response(id='13')
+            )
+
+        rental.status = ContractStatusInum.TERMINATED.value
+        rental.terminated_at = timezone.now()
+
+        rental.save()
+
+        return cls(
+            response=ResponseObject.get_response(id='1')
+        )    
 
 
 class Mutation(graphene.ObjectType):
@@ -404,3 +452,5 @@ class Mutation(graphene.ObjectType):
     create_house_rental_mutation = CreateHouseRentalMutation().Field()
     update_house_rental_mutation = UpdateHouseRentalMutation().Field()
     delete_house_rental_mutation = DeleteHouseRentalMutation().Field()
+    terminate_contract_mutation=  TerminateContractMutation().Field()
+    activate_contract_mutation =  ActivateContractMutation().Field()

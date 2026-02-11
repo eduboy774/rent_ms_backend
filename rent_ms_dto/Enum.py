@@ -56,4 +56,36 @@ class SystemTypeInum(enum.Enum):
       
 SystemTypeEnum = graphene.Enum.from_enum(SystemTypeInum)
 
+class MediumInum(enum.Enum):
+    SMS = "Sms"
+    EMAIL = "Email"
 
+MediumEnum = graphene.Enum.from_enum(MediumInum)
+
+
+class SmsStatusInum(enum.Enum):
+    PENDING = "Pending"
+    SENT = "Sent"
+    FAILED = "Failed"
+
+SmsStatusEnum = graphene.Enum.from_enum(SmsStatusInum)
+
+
+
+class ContractStatusInum(enum.Enum):
+    PENDING = "PENDING"
+    ACTIVE = "ACTIVE"
+    EXPIRED = "EXPIRED"
+    TERMINATED = "TERMINATED"
+
+
+ContractStatusEnum = graphene.Enum.from_enum(ContractStatusInum)
+
+
+class DurationInum(enum.Enum):
+    THREE_MONTHS = 3
+    SIX_MONTHS = 6
+    TWELVE_MONTHS = 12
+
+
+DurationEnum = graphene.Enum.from_enum(DurationInum)

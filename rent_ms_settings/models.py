@@ -4,6 +4,7 @@ from django.utils import timezone
 import uuid
 from django.contrib.postgres.fields import DateRangeField
 
+from rent_ms_dto.Enum import ContractStatusInum, DurationInum, SmsStatusInum
 from rent_ms_utils.RentalUtils import RentalUtils
 
 
@@ -76,7 +77,7 @@ class Notification(models.Model):
     uuid = models.UUIDField(editable=False,default=uuid.uuid4,unique=True)
     medium = models.CharField(choices=MEDIUM,max_length=100,unique=True,blank=False,null=False)
     payload = models.CharField(max_length=100,unique=True,blank=False,null=False)
-    status = models.CharField(choices=STATUS,max_length=255,blank=False,null=False, default='Pending')
+    status = models.CharField(choices=STATUS,max_length=255,blank=False,null=False, default=SmsStatusInum.PENDING.value)
     attempts = models.CharField(max_length=255,blank=False,null=False)
     error_message = models.CharField(max_length=255,blank=False,null=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -100,15 +101,16 @@ class HouseRental(models.Model):
     house = models.ForeignKey(House,on_delete=models.CASCADE,related_name='house_contracts')
     owner = models.ForeignKey(UsersProfiles,on_delete=models.CASCADE,related_name='owned_contracts')
     renter = models.ForeignKey(Renter,on_delete=models.CASCADE,related_name='renter_contracts')
-    duration = models.CharField(max_length=50,choices=DURATION,default='3')
+    duration = models.CharField(max_length=50,choices=DURATION,default=DurationInum.THREE_MONTHS.value)
     amount =  models.DecimalField(max_digits=15,decimal_places=2)
     total_amount =  models.DecimalField(max_digits=15,decimal_places=2)
     auto_renew = models.BooleanField(default=False)
     notice_period_days = models.IntegerField(default=30)
-    status = models.CharField(max_length=50,choices=CONSTRACT_STATUS,default='PENDING')
+    status = models.CharField(max_length=50,choices=CONSTRACT_STATUS,default=ContractStatusInum.PENDING.value)
     expired_at = models.DateTimeField(null=True, blank=True)
     terminated_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    activated_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
 
