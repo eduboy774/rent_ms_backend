@@ -110,7 +110,7 @@ class HouseRental(models.Model):
     expired_at = models.DateTimeField(null=True, blank=True)
     terminated_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    activated_at = models.DateTimeField(auto_now_add=True)
+    activated_at = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
 
 
