@@ -52,7 +52,6 @@ class UpdateHouseMutation(graphene.Mutation):
     def mutate(self, root, info, input):
         if input.owner_uuid:
             owner_info = UsersProfiles.objects.filter(profile_unique_id=input.owner_uuid,profile_is_active=True).first()
-
         house, success = House.objects.update_or_create(
             uuid = input.uuid,
             defaults={
