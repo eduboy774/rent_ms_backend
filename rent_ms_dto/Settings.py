@@ -127,3 +127,62 @@ class HouseRentalFilteringInputObject(graphene.InputObjectType):
     owner_uuid = graphene.String()
     renter_uuid = graphene.String()
     status = graphene.String()
+
+
+# Regions
+class RegionsObject(graphene.ObjectType):
+    id = graphene.String()
+    regional_unique_id = graphene.String()
+    reginal_name = graphene.String()
+    reginal_postcode = graphene.String()
+    reginal_napa_id = graphene.String()
+    reginal_code = graphene.String()
+
+class RegionsResponseObject(graphene.ObjectType):
+    data = graphene.List(RegionsObject)
+    response = graphene.Field(ResponseObject)
+
+class RegionFilteringInputObject(graphene.InputObjectType):
+    uuid = graphene.String()
+    name = graphene.String()
+
+
+# Districts
+class DistrictObject(graphene.ObjectType):
+    id = graphene.String()
+    district_unique_id = graphene.String()
+    district_name = graphene.String()
+    district_postcode = graphene.String()
+    district_napa_id = graphene.String()
+    district_parent_region = graphene.Field(RegionsObject)
+
+class DistrictResponseObject(graphene.ObjectType):
+    data = graphene.List(DistrictObject)
+    response = graphene.Field(ResponseObject)
+
+class DistrictFilteringInputObject(graphene.InputObjectType):
+    uuid = graphene.String()
+    name = graphene.String()
+    region_uuid = graphene.String()
+
+
+# Dashboard
+class DashboardSummaryObject(graphene.ObjectType):
+    total_users = graphene.Int()
+    total_houses = graphene.Int()
+    total_renters = graphene.Int()
+    total_rentals = graphene.Int()
+    active_rentals_count = graphene.Int()
+    pending_rentals_count = graphene.Int()
+    expired_rentals_count = graphene.Int()
+    users = graphene.List(UserProfileObject)
+    houses = graphene.List(HouseObject)
+    renters = graphene.List(RenterObject)
+    active_rentals = graphene.List(HouseRentalObject)
+    pending_rentals = graphene.List(HouseRentalObject)
+    expired_rentals = graphene.List(HouseRentalObject)
+
+
+class DashboardSummaryResponseObject(graphene.ObjectType):
+    data = graphene.Field(DashboardSummaryObject)
+    response = graphene.Field(ResponseObject)

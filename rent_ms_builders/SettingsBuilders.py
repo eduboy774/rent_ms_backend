@@ -92,3 +92,41 @@ class SettingsBuilders:
                 return HouseRentalObject()
         else:
             return HouseRentalObject()
+
+# Region
+    def get_region_data(id):
+        if id is not None:
+            region = Region.objects.filter(regional_unique_id=id).first()
+            if region:
+                return RegionsObject(
+                    id=region.pk,
+                    regional_unique_id=str(region.regional_unique_id),
+                    reginal_name=region.reginal_name,
+                    reginal_postcode=region.reginal_postcode,
+                    reginal_napa_id=region.reginal_napa_id,
+                    reginal_code=region.reginal_code,
+                )
+            else:
+                return RegionsObject()
+        else:
+            return RegionsObject()
+
+# District
+    def get_district_data(id):
+        if id is not None:
+            district = District.objects.filter(district_unique_id=id).first()
+            if district:
+                return DistrictObject(
+                    id=district.pk,
+                    district_unique_id=str(district.district_unique_id),
+                    district_name=district.district_name,
+                    district_postcode=district.district_postcode,
+                    district_napa_id=district.district_napa_id,
+                    district_parent_region=SettingsBuilders.get_region_data(
+                        district.district_parent_region.regional_unique_id if district.district_parent_region else None
+                    ),
+                )
+            else:
+                return DistrictObject()
+        else:
+            return DistrictObject()

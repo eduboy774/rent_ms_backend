@@ -121,3 +121,40 @@ class HouseRental(models.Model):
         db_table = "house_rentals"
         ordering = ["-id"]
         verbose_name_plural = "04. House Rentals"
+
+
+class Region(models.Model):
+    primary_key = models.AutoField(primary_key=True)
+    regional_unique_id = models.UUIDField(editable=False, default=uuid.uuid4, unique=True)
+    reginal_name = models.CharField(default='', max_length=9000)
+    reginal_postcode = models.CharField(default='', max_length=9000)
+    reginal_napa_id = models.CharField(default='', max_length=9000)
+    reginal_code = models.CharField(default='', max_length=9000, null=True, blank=True)
+    regional_createddate = models.DateField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return "{}".format(self.reginal_name)
+
+    class Meta:
+        db_table = 'regions'
+        ordering = ['-primary_key']
+        verbose_name_plural = "05. Regions"
+
+
+class District(models.Model):
+    primary_key = models.AutoField(primary_key=True)
+    district_unique_id = models.UUIDField(editable=False, default=uuid.uuid4, unique=True)
+    district_name = models.CharField(default='', max_length=9000)
+    district_postcode = models.CharField(default='', max_length=9000)
+    district_napa_id = models.CharField(default='', max_length=9000)
+    district_parent_region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
+    district_createddate = models.DateField(auto_now_add=True, null=True)
+
+    class Meta:
+        db_table = 'districts'
+        ordering = ['-primary_key']
+        verbose_name_plural = "06. Districts"
+
+
+
+

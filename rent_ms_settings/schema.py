@@ -99,6 +99,42 @@ class Query(ObjectType):
             response=ResponseObject.get_response(id="1"),
             data=rental_list
         )
-    
-    
-    
+
+    get_regions = graphene.Field(RegionsResponseObject, filtering=RegionFilteringInputObject())
+
+    @staticmethod
+    def resolve_get_regions(self, info, filtering=None, **kwargs):
+        if filtering is None:
+            return info.return_type.graphene_type(response=ResponseObject.get_response(id="2"), data=[])
+
+        regions = Region.objects.all().values('regional_unique_id')
+
+        if filtering.uuid is not None:
+            regions = regions.filter(regional_unique_id=filtering.uuid)
+        if filtering.name is not None:
+            regions = regions.filter(reginal_name__icontains=filtering.name)
+
+        region_list = list(map(lambda x: SettingsBuilders.get_region_data(str(x['regional_unique_id'])), regions))
+        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data=region_list)
+
+    get_districts = graphene.Field(DistrictResponseObject, filtering=DistrictFilteringInputObject())
+
+    @staticmethod
+    def resolve_get_districts(self, info, filtering=None, **kwargs):
+        if filtering is None:
+            return info.return_type.graphene_type(response=ResponseObject.get_response(id="2"), data=[])
+
+        districts = District.objects.all().values('district_unique_id')
+
+        if filtering.uuid is not None:
+            districts = districts.filter(district_unique_id=filtering.uuid)
+        if filtering.name is not None:
+            districts = districts.filter(district_name__icontains=filtering.name)
+        if filtering.region_uuid is not None:
+            districts = districts.filter(district_parent_region__regional_unique_id=filtering.region_uuid)
+
+        district_list = list(map(lambda x: SettingsBuilders.get_district_data(str(x['district_unique_id'])), districts))
+        return info.return_type.graphene_type(response=ResponseObject.get_response(id="1"), data=district_list)
+
+
+
