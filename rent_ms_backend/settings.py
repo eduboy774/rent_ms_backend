@@ -15,9 +15,9 @@ from dotenv import load_dotenv
 from dotenv import dotenv_values
 from pathlib import Path
 
-load_dotenv()
+load_dotenv('core/.env')
 
-config = dotenv_values(".env")
+config = dotenv_values("core/.env")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -116,17 +116,6 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
-
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.postgresql',
-       'NAME': config['DATABASE_NAME'],
-       'USER': config['DATABASE_USER'],
-       'PASSWORD': config['DATABASE_PASSWORD'],
-       'HOST': config['DATABASE_HOST'],
-       'PORT': config['DATABASE_PORT'],
-   }
 }
 
 

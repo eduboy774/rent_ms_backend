@@ -9,7 +9,7 @@ class BearerTokenAuthentication(BaseBackend):
     def authenticate(headers):
         try:
             bearer_token=headers['Authorization'].split(' ')[1]
-            token=AccessToken.objects.filter(token=bearer_token,expires__gt=now(), client__client_id='803bd66ba0eeeac8224d').first()
+            token=AccessToken.objects.filter(token=bearer_token,expires__gt=now(), client__client_id='91e2c759d6d7db86459e').first()
 
             return True, token.user
         except AccessToken.DoesNotExist:
