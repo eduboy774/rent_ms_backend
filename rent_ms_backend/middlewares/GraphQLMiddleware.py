@@ -30,15 +30,9 @@ class GraphQLAuthorizationMiddleware:
 
             if "Introspection" in str(request.body) or "__" in str(request.body):
                 json_data = {"data":{"NotAllowed":{"introspection":None,}}}
-                response = HttpResponse(json.dumps(json_data), c="application/json")
-
-
-            if "errors" in str(response.content):
-                json_data = {"data":{"errors":{"error":"an error occurred",}}}
                 response = HttpResponse(json.dumps(json_data), content_type="application/json")
 
-         
-            
+
             # if True:
             return response
 

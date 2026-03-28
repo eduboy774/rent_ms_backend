@@ -44,11 +44,11 @@ class CreateUsersMutation(graphene.Mutation):
             user.save()
 
             user_profile = UsersProfiles.objects.create(
-                profile_type=input.profile_type.value,
+                profile_type=UserUtils.get_enum_value(UserProfileInum, input.profile_type) if input.profile_type else 'NORMAL_PROFILE',
                 profile_phone=input.profile_phone,
                 profile_title=input.profile_title,
-                profile_level=input.profile_level.value,
-                profile_gender=input.profile_gender.value,
+                profile_level=UserUtils.get_enum_value(ProfileLevelInum, input.profile_level) if input.profile_level else 'REGION',
+                profile_gender=UserUtils.get_enum_value(GenderTypeInum, input.profile_gender) if input.profile_gender else 'NONE',
                 profile_user=user
             )
   

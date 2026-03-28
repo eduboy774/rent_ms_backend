@@ -18,28 +18,53 @@ class Query(ObjectType):
             user_uuids = list(
                 UsersProfiles.objects.filter(profile_is_active=True).values_list('profile_unique_id', flat=True)
             )
-            users_data = [UserAccountBuilder.get_user_profile_data(str(uid)) for uid in user_uuids]
+            users_data = []
+            for uid in user_uuids:
+                try:
+                    user_data = UserAccountBuilder.get_user_profile_data(str(uid))
+                    if user_data:
+                        users_data.append(user_data)
+                except Exception as e:
+                    print('Error fetching user profile:', e)
 
             # Houses
             house_uuids = list(House.objects.filter(is_active=True).values_list('uuid', flat=True))
-            houses_data = [SettingsBuilders.get_house_data(str(uid)) for uid in house_uuids]
+            houses_data = []
+            for uid in house_uuids:
+                try:
+                    house_data = SettingsBuilders.get_house_data(str(uid))
+                    if house_data:
+                        houses_data.append(house_data)
+                except Exception as e:
+                    print('Error fetching house data:', e)
 
             # Renters
             renter_uuids = list(Renter.objects.filter(is_active=True).values_list('uuid', flat=True))
-            renters_data = [SettingsBuilders.get_renter_data(str(uid)) for uid in renter_uuids]
+            renters_data = []
+            for uid in renter_uuids:
+                try:
+                    renter_data = SettingsBuilders.get_renter_data(str(uid))
+                    if renter_data:
+                        renters_data.append(renter_data)
+                except Exception as e:
+                    print('Error fetching renter data:', e)
 
             # All rentals
             all_rental_uuids = list(HouseRental.objects.filter(is_active=True).values('uuid', 'status'))
 
             active_rentals, pending_rentals, expired_rentals = [], [], []
             for r in all_rental_uuids:
-                obj = SettingsBuilders.get_house_rental_data(str(r['uuid']))
-                if r['status'] == 'ACTIVE':
-                    active_rentals.append(obj)
-                elif r['status'] == 'PENDING':
-                    pending_rentals.append(obj)
-                elif r['status'] == 'EXPIRED':
-                    expired_rentals.append(obj)
+                try:
+                    obj = SettingsBuilders.get_house_rental_data(str(r['uuid']))
+                    if obj:
+                        if r['status'] == 'ACTIVE':
+                            active_rentals.append(obj)
+                        elif r['status'] == 'PENDING':
+                            pending_rentals.append(obj)
+                        elif r['status'] == 'EXPIRED':
+                            expired_rentals.append(obj)
+                except Exception as e:
+                    print('Error fetching rental data:', e)
 
             summary = DashboardSummaryObject(
                 total_users=len(users_data),

@@ -10,10 +10,12 @@ from django.views.decorators.csrf import csrf_exempt
 config = dotenv_values(".env")
 
 class SendSms:
-    # Function to send sms
     def send_bulk_sms(request_data):
-        url = config['HUDUMA_SMS_URL']
-        api_token = config['HUDUMA_SMS_TOKEN_JWT']
+        try:
+            url = config['HUDUMA_SMS_URL']
+            api_token = config['HUDUMA_SMS_TOKEN_JWT']
+        except KeyError as e:
+            raise ValueError(f"Missing SMS config: {e}") from e
 
         headers = {
             "X-Huduma": f"Bearer {api_token}",

@@ -1,9 +1,34 @@
 import random
+import re
 from datetime import datetime
 from django.apps import apps
 
 
 class RentalUtils:
+
+    @staticmethod
+    def format_tanzania_phone_number(phone_number):
+        if not phone_number:
+            return None
+        
+        original_phone = phone_number
+        phone_number = phone_number.strip()
+        
+        phone_number = re.sub(r'\s+', '', phone_number)
+        
+        if phone_number.startswith('+'):
+            phone_number = phone_number[1:]
+        
+        if phone_number.startswith('0'):
+            phone_number = '255' + phone_number[1:]
+        elif not phone_number.startswith('255'):
+            phone_number = '255' + phone_number
+        
+        if len(phone_number) != 12:
+            print(f"Phone number format invalid: {original_phone} -> expected 12 digits")
+            return original_phone
+        
+        return phone_number
 
     @staticmethod
     def generate_contract_reference():
@@ -49,10 +74,11 @@ class RentalUtils:
 
     @staticmethod
     def generate_transaction_reference(prefix="RENT"):
+        import uuid
         company = "KASP"
         date_str = datetime.now().strftime("%Y%m%d")
-        unique_number = random.randint(1000, 9999)
-        return f"{company}-{prefix}-{date_str}-{unique_number}"
+        unique_id = str(uuid.uuid4())[:8]
+        return f"{company}-{prefix}-{date_str}-{unique_id}"
 
     
     

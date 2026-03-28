@@ -274,11 +274,11 @@ class CreateHouseRentalMutation(graphene.Mutation):
                     rental.reference_no
                     )
 
-                phone_number = rental.renter.phone_number
+                phone_number = RentalUtils.format_tanzania_phone_number(rental.renter.phone_number)
                 third_party_ref = RentalUtils.generate_transaction_reference()
 
-                    # preparing sms and send
-                bulk_request = {
+                if phone_number:
+                    bulk_request = {
                             "senderId": "Vilcom",
                             "envelopes": [
                                 {
@@ -290,25 +290,32 @@ class CreateHouseRentalMutation(graphene.Mutation):
                             "callbackUrl": callbackUrl
                         }
 
-                try:
+                    try:
                             bulk_response = SendSms.send_bulk_sms(bulk_request)
                             print(
                                 bulk_response.get('status'),
                                 bulk_response.get('code'),
                                 bulk_response.get('message')
                             )
-                except Exception as e:
-                        print(e)
-                        print("Failed to send bulk SMS")
-
-                RentMsSms.objects.create(
-                status = bulk_response.get('status'),
-                code = bulk_response.get('code'),
-                message =bulk_response.get('message'),
-                message_to_user = message_to_send ,
-                user_phone_number = phone_number,
-                third_party_ref = third_party_ref
-                )
+                            RentMsSms.objects.create(
+                            status = bulk_response.get('status'),
+                            code = bulk_response.get('code'),
+                            message =bulk_response.get('message'),
+                            message_to_user = message_to_send ,
+                            user_phone_number = phone_number,
+                            third_party_ref = third_party_ref
+                            )
+                    except Exception as e:
+                            print(e)
+                            print("Failed to send bulk SMS")
+                            RentMsSms.objects.create(
+                            status = "FAILED",
+                            code = "500",
+                            message = str(e),
+                            message_to_user = message_to_send ,
+                            user_phone_number = phone_number if phone_number else rental.renter.phone_number,
+                            third_party_ref = third_party_ref
+                            )
 
 
         data = SettingsBuilders.get_house_rental_data(id=rental.uuid)

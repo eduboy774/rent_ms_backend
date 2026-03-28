@@ -39,6 +39,12 @@ class UsersProfiles(models.Model):
     def __str__(self):
         return "{}-{}".format(self.profile_title, self.profile_user)
 
+    @property
+    def full_name(self):
+        if self.profile_user:
+            return f"{self.profile_user.first_name} {self.profile_user.last_name}".strip()
+        return ""
+
 
 class ForgotPasswordRequestUsers(models.Model):
     id = models.AutoField(primary_key=True)
