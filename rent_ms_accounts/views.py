@@ -1,6 +1,8 @@
 import graphene
 from graphene_federation import build_schema
 from graphql import GraphQLError
+from django.utils import timezone
+from datetime import timedelta
 from rent_ms_backend.decorators.Permission import has_mutation_access
 
 from rent_ms_dto.Enum import GenderTypeInum, ProfileLevelInum, UserProfileInum
@@ -215,9 +217,9 @@ class ForgotPasswordMutation(graphene.Mutation):
     # @has_mutation_access(permissions=['can_manage_settings'])
     def mutate(self, root, info,  user_email):
         try:
-            user = User.objects.filter(username = user_email ).first()
+            user = User.objects.filter(email = user_email).first()
             if user is None:
-                return self(response=ResponseObject.get_response(id="3"))
+                return self(response=ResponseObject.get_response(id="20"))
             
             request_token = UserUtils.get_forgot_password_token()
            
@@ -226,7 +228,7 @@ class ForgotPasswordMutation(graphene.Mutation):
                 request_token = request_token
             )
 
-            url = config['FRONTEND_DOMAIN'] + f"password-reset/{request_token}/"
+            url = f"{config['FRONTEND_DOMAIN'].strip()}/password-reset/{request_token}"
 
             body = {
                 'receiver_details': user.email,
@@ -240,7 +242,8 @@ class ForgotPasswordMutation(graphene.Mutation):
 
             return self(response=ResponseObject.get_response(id="1"))
         except Exception as e:
-            return self(response=ResponseObject.get_response(id="5"))
+            print(f"ForgotPassword error: {str(e)}")
+            return self(response=ResponseObject.get_response(id="6"))
 
 class ChangeUserPasswordMutation(graphene.Mutation):
     class Arguments:
@@ -263,6 +266,39 @@ class ChangeUserPasswordMutation(graphene.Mutation):
         return self(response=ResponseObject.get_response(id="1"))
 
 
+class ResetPasswordMutation(graphene.Mutation):
+    class Arguments:
+        input = ResetPasswordInput(required=True)
+
+    response = graphene.Field(ResponseObject)
+
+    @classmethod
+    def mutate(self, root, info, input):
+        token_record = ForgotPasswordRequestUsers.objects.filter(
+            request_token=input.request_token,
+            request_is_active=True,
+            request_is_used=False
+        ).first()
+
+        if not token_record:
+            return self(response=ResponseObject.get_response(id="17"))
+
+        if token_record.request_is_used:
+            return self(response=ResponseObject.get_response(id="18"))
+
+        if timezone.now() > token_record.request_created_at + timedelta(hours=1):
+            return self(response=ResponseObject.get_response(id="17"))
+
+        user = token_record.request_user
+        user.set_password(input.user_password)
+        user.save()
+
+        token_record.request_is_used = True
+        token_record.save()
+
+        return self(response=ResponseObject.get_response(id="19"))
+
+
 
 
 class Mutation(graphene.ObjectType):
@@ -275,6 +311,7 @@ class Mutation(graphene.ObjectType):
     update_my_profile_mutation = UpdateMyProfileMutation.Field()
     forgot_password_mutation = ForgotPasswordMutation.Field()
     change_user_password_mutation = ChangeUserPasswordMutation.Field()
+    reset_password_mutation = ResetPasswordMutation.Field()
 
 
 schema = build_schema(Mutation, types=[])

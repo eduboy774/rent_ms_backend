@@ -89,7 +89,30 @@
         "code": 9014,
         "status": false,
         "message": "Renter Alread Exist In the Same House"
+    },
+    {
+        "id": "17",
+        "code": 9015,
+        "status": false,
+        "message": "Invalid or expired reset token"
+    },
+    {
+        "id": "18",
+        "code": 9016,
+        "status": false,
+        "message": "Reset token already used"
+    },
+    {
+        "id": "19",
+        "code": 9017,
+        "status": true,
+        "message": "Password reset successful"
+    },
+    {
+        "id": "20",
+        "code": 9018,
+        "status": false,
+        "message": "User with this email not found"
     }
-   
 ]
   

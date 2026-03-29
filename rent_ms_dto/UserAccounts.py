@@ -98,6 +98,10 @@ class SetPasswordFilteringInputObject(graphene.InputObjectType):
     request_token = graphene.String()
     user_password = graphene.String()
 
+class ResetPasswordInput(graphene.InputObjectType):
+    request_token = graphene.String()
+    user_password = graphene.String()
+
 class ForgortPasswordFilteringInputObject(graphene.InputObjectType):
     old_password = graphene.String()
     new_password = graphene.String()

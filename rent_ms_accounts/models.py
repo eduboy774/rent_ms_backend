@@ -52,6 +52,7 @@ class ForgotPasswordRequestUsers(models.Model):
     request_token = models.CharField(max_length=300, editable=False, default=None)
     request_is_used = models.BooleanField(default=False)
     request_is_active = models.BooleanField(default=True)
+    request_created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     
     class Meta:
         db_table = 'forgot_password_request'

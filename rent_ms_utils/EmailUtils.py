@@ -1,13 +1,13 @@
-from django.template.loader import render_to_string
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from jinja2 import Environment, FileSystemLoader 
 
 from dotenv import dotenv_values
+import os
 
 config = dotenv_values(".env")
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class EmailNotifications:
@@ -18,35 +18,37 @@ class EmailNotifications:
         EMAIL_PORT = config['EMAIL_PORT']
         DEFAULT_FROM_EMAIL = config['DEFAULT_FROM_EMAIL']
         
-        html_content = render_to_string(html_template, {'data': emailBody})
+        reset_url = emailBody.get('url', '')
         
-        # Create a Jinja2 environment with the HTML template
-        env = Environment(loader=FileSystemLoader(html_template))
-        template = env.from_string(html_content)
-
-        # Render the template with the provided context
-        rendered_template = template.render({'data': emailBody})
-    
-        # Create a multipart message and set the headers
+        template_path = os.path.join(BASE_DIR, 'rent_ms_backend_html', 'templates', html_template)
+        
+        with open(template_path, 'r') as f:
+            html_content = f.read()
+        
+        html_content = html_content.replace('{{ data.url }}', reset_url)
+        
+        if emailBody.get('user'):
+            user = emailBody['user']
+            first_name = getattr(user, 'first_name', '') or ''
+            html_content = html_content.replace('{{ data.user.first_name }}', first_name)
+        
+        text_content = f"Password Reset Request\n\nClick the link below to reset your password:\n{reset_url}\n\nIf you didn't request this, please ignore this email."
+        
         msg = MIMEMultipart()
         msg['From'] = DEFAULT_FROM_EMAIL
         msg['To'] = emailBody['receiver_details']
         msg['Subject'] = emailBody['subject']
 
-        # Attach the rendered HTML content as the email body
-        msg.attach(MIMEText(rendered_template, 'html'))
+        msg.attach(MIMEText(text_content, 'plain'))
+        msg.attach(MIMEText(html_content, 'html'))
         
-        # Create a secure SSL/TLS connection to the SMTP server
         server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT)
         server.starttls()
 
-        # Login to the email account
         server.login(EMAIL_USER, EMAIL_PASSWORD)
 
-        # Send the email
         server.sendmail(DEFAULT_FROM_EMAIL, emailBody['receiver_details'], msg.as_string())
 
-        # Disconnect from the server
         server.quit()
 
         return True
