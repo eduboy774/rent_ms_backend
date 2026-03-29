@@ -95,7 +95,8 @@ class CreateRenterMutation(graphene.Mutation):
             phone_number = input.phone_number,
             nida_number = input.nida_number,
             defaults={
-                'is_active': True
+                'is_active': True,
+                'renter_title': input.renter_title
             }
         )
 
@@ -119,6 +120,7 @@ class UpdateRenterMutation(graphene.Mutation):
                 'full_name' : input.full_name,
                 'phone_number' : input.phone_number,
                 'nida_number' : input.nida_number,
+                'renter_title': input.renter_title,
                 'is_active': True
             }
         )

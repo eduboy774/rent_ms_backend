@@ -31,6 +31,7 @@ class SettingsBuilders:
                     id = renter.id,
                     uuid = renter.uuid,
                     full_name = renter.full_name,
+                    renter_title = renter.renter_title,
                     phone_number = renter.phone_number,
                     nida_number = renter.nida_number,
                     is_active = renter.is_active,
