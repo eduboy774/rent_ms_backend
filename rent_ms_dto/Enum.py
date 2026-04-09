@@ -89,3 +89,13 @@ class DurationInum(enum.Enum):
 
 
 DurationEnum = graphene.Enum.from_enum(DurationInum)
+
+
+class OrderStatusInum(enum.Enum):
+    PENDING = "Pending"
+    COMPLETED = "Completed"
+    FAILED = "Failed"
+    CANCELLED = "Cancelled"
+
+
+OrderStatusEnum = graphene.Enum.from_enum(OrderStatusInum)

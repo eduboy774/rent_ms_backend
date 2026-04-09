@@ -3,6 +3,7 @@ from rent_ms_accounts.models import  UsersProfiles
 from django.utils import timezone
 import uuid
 from django.contrib.postgres.fields import DateRangeField
+from datetime import date
 
 from rent_ms_dto.Enum import ContractStatusInum, DurationInum, SmsStatusInum
 from rent_ms_utils.RentalUtils import RentalUtils
@@ -154,6 +155,48 @@ class District(models.Model):
         db_table = 'districts'
         ordering = ['-primary_key']
         verbose_name_plural = "06. Districts"
+
+
+PAYMENT_METHOD_CHOICES = (
+    ('Cash', 'Cash'),
+    ('Card', 'Card'),
+    ('MobileMoney', 'Mobile Money'),
+    ('BankTransfer', 'Bank Transfer'),
+)
+
+PAYMENT_STATUS_CHOICES = (
+    ('Pending', 'Pending'),
+    ('Completed', 'Completed'),
+    ('Failed', 'Failed'),
+    ('Refunded', 'Refunded'),
+)
+
+PAYMENT_TYPE_CHOICES = (
+    ('Full', 'Full'),
+    ('Partial', 'Partial'),
+)
+
+
+class RentalPayment(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    rental = models.ForeignKey(HouseRental, on_delete=models.CASCADE, related_name='payments')
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    payment_date = models.DateField(default=date.today)
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES)
+    payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE_CHOICES)
+    status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='Completed')
+    notes = models.TextField(blank=True, null=True)
+    recorded_by = models.ForeignKey(UsersProfiles, on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return "{} - {} - {}".format(self.rental.reference_no, self.amount, self.payment_method)
+
+    class Meta:
+        db_table = "rental_payments"
+        ordering = ["-id"]
+        verbose_name_plural = "07. Rental Payments"
 
 
 

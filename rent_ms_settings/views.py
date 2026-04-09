@@ -2,6 +2,7 @@ import graphene
 from rent_ms_builders.SettingsBuilders import SettingsBuilders
 from rent_ms_dto.Response import ResponseObject
 from rent_ms_dto.Settings import *
+from rent_ms_dto.Payment import RentalPaymentInputObject, RentalPaymentObject
 from rent_ms_settings.models import *
 from django.utils import timezone
 from django.contrib.postgres.fields import DateRangeField
@@ -11,6 +12,7 @@ from rent_ms_sms.models import RentMsSms
 from rent_ms_sms.views import SendSms
 from rent_ms_utils.RentalUtils import RentalUtils
 from django.utils import timezone
+from datetime import date
 
 from dotenv import dotenv_values
 
@@ -438,6 +440,172 @@ class TerminateContractMutation(graphene.Mutation):
         )    
 
 
+# Rental Payment Mutations
+class CreateRentalPaymentMutation(graphene.Mutation):
+    class Arguments:
+        input = RentalPaymentInputObject()
+
+    response = graphene.Field(ResponseObject)
+    data = graphene.Field(RentalPaymentObject)
+
+    @classmethod
+    @transaction.atomic
+    def mutate(cls, root, info, input):
+        rental = HouseRental.objects.filter(
+            uuid=input.rental_uuid,
+            is_active=True
+        ).first()
+
+        if not rental:
+            return cls(response=ResponseObject.get_response(id='13'))
+
+        user = info.context.user if hasattr(info.context, 'user') else None
+        recorded_by = None
+        if user and hasattr(user, 'profile_unique_id'):
+            recorded_by = UsersProfiles.objects.filter(
+                profile_unique_id=user.profile_unique_id,
+                profile_is_active=True
+            ).first()
+
+        payment = RentalPayment.objects.create(
+            rental=rental,
+            amount=input.amount,
+            payment_date=input.payment_date if input.payment_date else date.today(),
+            payment_method=input.payment_method.name if input.payment_method else 'Cash',
+            payment_type=input.payment_type.name if input.payment_type else 'Partial',
+            status='Completed',
+            notes=input.notes,
+            recorded_by=recorded_by,
+            is_active=True
+        )
+
+        total_paid = RentalPayment.objects.filter(
+            rental=rental,
+            is_active=True,
+            status='Completed'
+        ).aggregate(total=models.Sum('amount'))['total'] or 0
+
+        if float(total_paid) >= float(rental.total_amount):
+            rental.status = ContractStatusInum.ACTIVE.value
+            rental.activated_at = timezone.now()
+            rental.save()
+
+            if rental.renter:
+                message = RentalUtils.generate_payment_confirmation_message(
+                    rental.renter.renter_title,
+                    rental.renter.full_name,
+                    float(input.amount),
+                    rental.reference_no
+                )
+                phone = RentalUtils.format_tanzania_phone_number(rental.renter.phone_number)
+                third_party_ref = RentalUtils.generate_transaction_reference()
+
+                if phone:
+                    bulk_request = {
+                        "senderId": "Vilcom",
+                        "envelopes": [{"message": message, "number": phone, "thirdPartyRef": third_party_ref}],
+                        "callbackUrl": callbackUrl
+                    }
+                    try:
+                        bulk_response = SendSms.send_bulk_sms(bulk_request)
+                        RentMsSms.objects.create(
+                            status=bulk_response.get('status'),
+                            code=bulk_response.get('code'),
+                            message=bulk_response.get('message'),
+                            message_to_user=message,
+                            user_phone_number=phone,
+                            third_party_ref=third_party_ref
+                        )
+                    except Exception as e:
+                        RentMsSms.objects.create(
+                            status="FAILED",
+                            code="500",
+                            message=str(e),
+                            message_to_user=message,
+                            user_phone_number=phone,
+                            third_party_ref=third_party_ref
+                        )
+
+        data = SettingsBuilders.get_rental_payment_data(id=payment.uuid)
+        return cls(response=ResponseObject.get_response(id='1'), data=data)
+
+
+class UpdateRentalPaymentMutation(graphene.Mutation):
+    class Arguments:
+        input = RentalPaymentInputObject()
+
+    response = graphene.Field(ResponseObject)
+    data = graphene.Field(RentalPaymentObject)
+
+    @classmethod
+    @transaction.atomic
+    def mutate(cls, root, info, input):
+        payment = RentalPayment.objects.filter(
+            uuid=input.uuid,
+            is_active=True
+        ).first()
+
+        if not payment:
+            return cls(response=ResponseObject.get_response(id='13'))
+
+        if input.amount is not None:
+            payment.amount = input.amount
+        if input.payment_date is not None:
+            payment.payment_date = input.payment_date
+        if input.payment_method is not None:
+            payment.payment_method = input.payment_method.name
+        if input.payment_type is not None:
+            payment.payment_type = input.payment_type.name
+        if input.status is not None:
+            payment.status = input.status
+        if input.notes is not None:
+            payment.notes = input.notes
+
+        payment.save()
+
+        data = SettingsBuilders.get_rental_payment_data(id=payment.uuid)
+        return cls(response=ResponseObject.get_response(id='1'), data=data)
+
+
+class DeleteRentalPaymentMutation(graphene.Mutation):
+    class Arguments:
+        uuid = graphene.String(required=True)
+
+    response = graphene.Field(ResponseObject)
+
+    @classmethod
+    def mutate(cls, root, info, uuid):
+        payment = RentalPayment.objects.filter(uuid=uuid).first()
+        if not payment:
+            return cls(response=ResponseObject.get_response(id='13'))
+
+        payment.is_active = False
+        payment.save()
+
+        return cls(response=ResponseObject.get_response(id='1'))
+
+
+class RefundRentalPaymentMutation(graphene.Mutation):
+    class Arguments:
+        uuid = graphene.String(required=True)
+
+    response = graphene.Field(ResponseObject)
+    data = graphene.Field(RentalPaymentObject)
+
+    @classmethod
+    @transaction.atomic
+    def mutate(cls, root, info, uuid):
+        payment = RentalPayment.objects.filter(uuid=uuid, is_active=True).first()
+        if not payment:
+            return cls(response=ResponseObject.get_response(id='13'))
+
+        payment.status = 'Refunded'
+        payment.save()
+
+        data = SettingsBuilders.get_rental_payment_data(id=payment.uuid)
+        return cls(response=ResponseObject.get_response(id='1'), data=data)
+
+
 class Mutation(graphene.ObjectType):
     
     # House Mutation
@@ -462,3 +630,9 @@ class Mutation(graphene.ObjectType):
     delete_house_rental_mutation = DeleteHouseRentalMutation().Field()
     terminate_contract_mutation=  TerminateContractMutation().Field()
     activate_contract_mutation =  ActivateContractMutation().Field()
+
+    # Rental Payment Mutation
+    create_rental_payment_mutation = CreateRentalPaymentMutation().Field()
+    update_rental_payment_mutation = UpdateRentalPaymentMutation().Field()
+    delete_rental_payment_mutation = DeleteRentalPaymentMutation().Field()
+    refund_rental_payment_mutation = RefundRentalPaymentMutation().Field()

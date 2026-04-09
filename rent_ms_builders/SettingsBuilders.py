@@ -1,4 +1,5 @@
 from rent_ms_dto.Settings import *
+from rent_ms_dto.Payment import RentalPaymentObject
 from rent_ms_settings.models import *
 from rent_ms_builders.UserAccountsBuilders import UserAccountBuilder
 
@@ -131,3 +132,31 @@ class SettingsBuilders:
                 return DistrictObject()
         else:
             return DistrictObject()
+
+# Rental Payment
+    def get_rental_payment_data(id):
+        if id is not None:
+            payment = RentalPayment.objects.filter(uuid=id, is_active=True).first()
+            if payment:
+                return RentalPaymentObject(
+                    id=payment.id,
+                    uuid=str(payment.uuid),
+                    rental=SettingsBuilders.get_house_rental_data(
+                        payment.rental.uuid if payment.rental else None
+                    ),
+                    amount=float(payment.amount),
+                    payment_date=payment.payment_date,
+                    payment_method=payment.payment_method,
+                    payment_type=payment.payment_type,
+                    status=payment.status,
+                    notes=payment.notes,
+                    recorded_by=UserAccountBuilder.get_user_profile_data(
+                        payment.recorded_by.profile_unique_id if payment.recorded_by else None
+                    ),
+                    created_at=payment.created_at,
+                    is_active=payment.is_active,
+                )
+            else:
+                return RentalPaymentObject()
+        else:
+            return RentalPaymentObject()
