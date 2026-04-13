@@ -31,15 +31,12 @@ class EmailNotifications:
             user = emailBody['user']
             first_name = getattr(user, 'first_name', '') or ''
             html_content = html_content.replace('{{ data.user.first_name }}', first_name)
-        
-        text_content = f"Password Reset Request\n\nClick the link below to reset your password:\n{reset_url}\n\nIf you didn't request this, please ignore this email."
-        
+
         msg = MIMEMultipart()
         msg['From'] = DEFAULT_FROM_EMAIL
         msg['To'] = emailBody['receiver_details']
         msg['Subject'] = emailBody['subject']
 
-        msg.attach(MIMEText(text_content, 'plain'))
         msg.attach(MIMEText(html_content, 'html'))
         
         server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT)

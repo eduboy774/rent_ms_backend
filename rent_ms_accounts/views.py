@@ -234,7 +234,7 @@ class ForgotPasswordMutation(graphene.Mutation):
                 'receiver_details': user.email,
                 'user': user,
                 'url': url,
-                'subject': "Vilcom Password Reset"
+                'subject': "RentMS Password Reset"
             }
 
             EmailNotifications.send_email_notification(body, 'password_reset.html')
