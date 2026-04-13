@@ -113,6 +113,36 @@
         "code": 9018,
         "status": false,
         "message": "User with this email not found"
+    },
+    {
+        "id": "21",
+        "code": 9021,
+        "status": false,
+        "message": "Invalid amount. Amount must be greater than 0"
+    },
+    {
+        "id": "22",
+        "code": 9022,
+        "status": false,
+        "message": "Payment method is required"
+    },
+    {
+        "id": "23",
+        "code": 9023,
+        "status": false,
+        "message": "Rental not found or inactive"
+    },
+    {
+        "id": "24",
+        "code": 9024,
+        "status": false,
+        "message": "Payment date cannot be in the future"
+    },
+    {
+        "id": "25",
+        "code": 9025,
+        "status": false,
+        "message": "Payment not found or already deleted"
     }
 ]
   
